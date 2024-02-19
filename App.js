@@ -13,7 +13,7 @@ import HomeTabNavigator from "./components/navigation/TabNavigator";
 import { View } from "react-native";
 import DependentScreen from "./components/screens/patientVisit/DependentScreen";
 import InsuranceScreen from "./components/screens/patientVisit/InsuranceScreen";
-
+import Toast from 'react-native-toast-message';
 const Drawer = createDrawerNavigator();
 
 
@@ -39,6 +39,7 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="InsuranceScreen" component={InsuranceScreen} />
         <Drawer.Screen name="Home" component={HomeTabNavigator} />
       </Drawer.Navigator>
+      <Toast style={{zIndex: 99999}}/>
     </View>
     );
   };

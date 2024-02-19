@@ -32,7 +32,7 @@ const InsuranceScreen = ({route,navigation}) => {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(true);
-    const { request_type} = route.params;
+    const { request_type} = route.params || '1';
 
 
     const getPatientId = async () => {
