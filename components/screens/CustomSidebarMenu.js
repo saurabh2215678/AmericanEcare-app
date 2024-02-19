@@ -224,12 +224,12 @@ const CustomSidebarMenu = (props) => {
                     <Text>Change Password </Text>
                   </TouchableOpacity>
                 </View>
-
+                */}
                 <View style={{backgroundColor: '#eee',padding: 6,marginTop: 10 }}>
                   <TouchableOpacity onPress={()=>this.logout()}>
                     <Text>Logout </Text>
                   </TouchableOpacity>
-                </View> */}
+                </View> 
 
             </DrawerContentScrollView>
         </SafeAreaView>

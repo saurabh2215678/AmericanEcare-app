@@ -1,3 +1,7 @@
+import axios from "axios";
+import { Strings } from "./components/screens/utils";
+import moment from "moment";
+
 export const SideBarData = [
     {
         name: 'Dashboard',
@@ -52,3 +56,36 @@ export const SideBarData = [
         ]
     }
 ]
+
+export const HitApi = async ({endpoint, data, withStatus = false}) => {
+    const API_URL = Strings.baseUrl.url;
+    let axiosConfig = {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+    };
+
+    try {
+        const response = await axios.post(API_URL + endpoint, data, axiosConfig);
+        if(withStatus){
+            const responseData = response.data;
+            return responseData;
+        }else{
+            const responseData = response.data.data;
+            return responseData;
+        }
+    } catch (error) {
+        console.error(`Error for endpoint ${endpoint}:`, error);
+        throw error;
+    }
+}
+
+export const calculateAge = ({AgeString}) => {
+    const now = moment();
+    const birthDate = moment(AgeString);
+    const years = now.diff(birthDate, 'years');
+    const months = now.diff(birthDate, 'months') % 12;
+    // const age = `${years} year(s), ${months} month(s)`;
+    const age = `${years} year`;
+    return age;
+}
