@@ -6,6 +6,10 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
+import { HitApi } from "../../../utils";
+import DependentItem from "../components/DependentItem";
+import { ScrollView } from "react-native-gesture-handler";
+
 
 const DependentScreen = () =>{
   const [addModal, setAddMoal] = useState(false);
@@ -13,59 +17,40 @@ const DependentScreen = () =>{
   const [submitted, setsubmitted] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [genderDropDownOpened, setGenderDropDownOpened] = useState(false);
+  const [DependentList, setDependentList] = useState([]);
+  const [selectedAgeDependent, setSelectedAgeDependent] = useState(-1);
+
+
   const genders = [
     {label: 'Male', value:'male'},
     {label: 'Female', value:'female'}
   ];
 
   const addDependentApi = async () => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-    const urlencoded = new URLSearchParams();
-    for(const property in formData){
-      urlencoded.append(property, `${formData[property]}`);
+    const apiOptions = {
+      endpoint: 'front/api/save_dependent',
+      data: { ...formData },
+      withStatus: true
     }
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: urlencoded,
-      redirect: "follow"
-    };
-
-    const resp = await fetch("https://v2.americanecare.com/front/api/save_dependent", requestOptions);
-    const respjson = await resp.json();
+    const ApiResp = await HitApi(apiOptions);
+    // console.log(ApiResp)
     setAddMoal(false);
+    getDependentApi(formData.patient_id);
     Toast.show({
       type: 'success',
-      text1: respjson.msg
-    })
-      // .then((response) => response.text())
-      // .then((result) => console.log(result))
-      // .catch((error) => console.error(error));
+      text1: ApiResp.msg
+    });
   }
 
   const getDependentApi = async (patientId) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-    const urlencoded = new URLSearchParams();
-    urlencoded.append("patient_id", patientId);
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: urlencoded,
-      redirect: "follow"
-    };
-
-    const resp = await fetch("https://v2.americanecare.com/front/api/get_patient_dependent", requestOptions);
-    const respjson = await resp.json();
-    console.log(respjson);
-      // .then((response) => response.text())
-      // .then((result) => console.log(result))
-      // .catch((error) => console.error(error));
+    const apiOptions = {
+      endpoint: 'front/api/get_patient_dependent',
+      data: { patient_id : patientId }
+    }
+    const ApiResp = await HitApi(apiOptions);
+    console.log('getting dep api')
+    console.log(ApiResp)
+    setDependentList(ApiResp);
   }
 
   const AddPatientDependent = async () =>{
@@ -77,7 +62,8 @@ const DependentScreen = () =>{
       formData['dependent_last_name'] && 
       formData['dependent_dob'] && 
       formData['dependent_relationship'] && 
-      formData['gender'] 
+      formData['gender'] && 
+      formData['patient_phone']
     ){
       addDependentApi();
     }
@@ -131,14 +117,16 @@ const DependentScreen = () =>{
 
   return (
     <Container>
-        <View>
+        <ScrollView style={fullDependent}>
           <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>setAddMoal(true)}>
             <View style={{backgroundColor: '#33BAD8', paddingHorizontal:7, paddingVertical: 6, margin: 8, borderRadius: 3 }}>
               <Icon name="plus" size={12} color="#ffffff" />
             </View>
           </TouchableOpacity>
-          
-        </View>
+          <View>
+            {DependentList.map((item, index)=><DependentItem key={index} data={item} selected={selectedAgeDependent === item.id} setSelected={setSelectedAgeDependent} getDependentApi={getDependentApi}/>)}
+          </View>
+        </ScrollView>
         <Modal
           visible={addModal}
           animationType="fade"
@@ -168,8 +156,11 @@ const DependentScreen = () =>{
             <TextInput placeholder="DOB" style={InputStyle} value={getDOBValue()} onFocus={()=>setShowDatePicker(true)} ref={(input) => (dobInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(relationshipInputRef)} />
             {(submitted && !formData['dependent_dob']) && <Text style={errorStyle}>DOB is Required</Text>}
             <View style={spacer}></View>
-            <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} ref={(input) => (relationshipInputRef = input)} returnKeyType="done"/>
+            <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} ref={(input) => (relationshipInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(phoneInputRef)}/>
             {(submitted && !formData['dependent_relationship']) && <Text style={errorStyle}>Relationship is Required</Text>}
+            <View style={spacer}></View>
+            <TextInput placeholder="Phone Number" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'patient_phone')} ref={(input) => (phoneInputRef = input)} returnKeyType="done"/>
+            {(submitted && !formData['patient_phone']) && <Text style={errorStyle}>Phone No is Required</Text>}
             <View style={spacer}></View>
             <View style={{justifyContent : 'center', width: '90%'}}>
             <DropDownPicker
@@ -183,7 +174,7 @@ const DependentScreen = () =>{
               style={{ borderRadius: 0, marginHorizontal:0, borderWidth:0, borderBottomWidth: 1, borderColor: '#ababab', minHeight: 20, paddingHorizontal: 0, paddingVertical: 0,  paddingBottom:5}}
               textStyle={{color: formData['gender'] ? '#000' : '#adadad'}}
               listItemLabelStyle={{color: '#1c1e21'}}
-              
+              placeholder="Select Gender"
             />
             </View>
             {/* <TextInput placeholder="Gender" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'gender')} ref={(input) => (genderInputRef = input)} returnKeyType="done" onSubmitEditing={AddPatientDependent}/> */}
@@ -212,4 +203,5 @@ const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
 const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
+const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 export default DependentScreen;
