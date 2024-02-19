@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 
 const InsuranceScreen = ({route,navigation}) => {
+  console.log('r')
     const API_URL = Strings.baseUrl.url;
    
     const [DisplayAlert, setDisplayAlert] = useState(0)
@@ -32,7 +33,7 @@ const InsuranceScreen = ({route,navigation}) => {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(true);
-    const { request_type} = route.params;
+    const { request_type} = route.param || '1';
 
 
     const getPatientId = async () => {

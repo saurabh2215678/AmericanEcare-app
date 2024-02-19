@@ -16,7 +16,7 @@ import InsuranceScreen from "./components/screens/patientVisit/InsuranceScreen";
 
 const Drawer = createDrawerNavigator();
 
-
+console.log('h')
 function Root() {
   return (
     <Drawer.Navigator useLegacyImplementation>
