@@ -14,6 +14,10 @@ import { View } from "react-native";
 import DependentScreen from "./components/screens/patientVisit/DependentScreen";
 import InsuranceScreen from "./components/screens/patientVisit/InsuranceScreen";
 import Toast from 'react-native-toast-message';
+import DateAndTimeScreen from "./components/screens/patientVisit/DateAndTimeScreen";
+import ScheduleScreen from "./components/screens/patientVisit/ScheduleScreen";
+import MyVisitScreen from "./components/screens/MyVisitScreen";
+import PharmacyScreen from "./components/screens/patientVisit/PharmacyScreen";
 const Drawer = createDrawerNavigator();
 
 
@@ -38,6 +42,11 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="DependentScreen" component={DependentScreen} />
         <Drawer.Screen name="InsuranceScreen" component={InsuranceScreen} />
         <Drawer.Screen name="Home" component={HomeTabNavigator} />
+        <Drawer.Screen name="DateAndTimeScreen" component={DateAndTimeScreen} />
+        <Drawer.Screen name="ScheduleScreen" component={ScheduleScreen} />
+        <Drawer.Screen name="MyVisitScreen" component={MyVisitScreen} />
+        <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
+
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999}}/>
     </View>
