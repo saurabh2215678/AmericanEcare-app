@@ -1,275 +1,143 @@
-import React, { useState,useEffect } from 'react';
-import {View, Text, StyleSheet,TextInput,StatusBar,ScrollView, Pressable,ImageBackground,Alert,TouchableOpacity,SafeAreaView,Modal,FlatList,RefreshControl} from 'react-native';
-import {Container,AppHeader,Input,Button} from '../components';
-import Styles from '../styles/LoginRegiesterStyle/RegisterScreenStyle';
-import Style from '../styles/CommonStyle/Style';
-import images from '../images';
-//import { useSelector } from "react-redux";
-import { SH, Strings } from '../utils';
-import { Dropdown } from 'react-native-element-dropdown';
-//import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import { TouchableOpacity } from "react-native";
+import { Text, View, TextInput } from "react-native"
+import { HitApi } from "../../../utils";
 
-const InsuranceScreen = ({route,navigation}) => {
-    const API_URL = Strings.baseUrl.url;
-   
-    const [DisplayAlert, setDisplayAlert] = useState(0)
-    
-    const [insurance_name, setinsurance_name] = useState("");
-    const [subscriber_name, setsubscriber_name] = useState("");
-    const [identification_no, setidentification_no] = useState("");
-    const [group_no, set_group_no] = useState("");
-    const [sysbolic_bp, set_sysbolic_bp] = useState("");
-    const [rx_bin, set_rx_bin] = useState("");
-    const [rx_pcn, set_rx_pcn] = useState("");
-    const [rx_grp, set_rx_grp] = useState("");
+const InsuranceScreen = ()=>{
 
+  const [formData, setFormData] = useState({});
+  const [submitted, setsubmitted] = useState(false);
+  const [patientId, setPatientId] = useState(false);
 
-    const [patientId, setpatientId] = useState("");
-    const [value, setValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [refreshing, setRefreshing] = useState(true);
-    const { request_type} = route.params || '1';
+  const handleTextChange = (text, fieldName) => {
+    const newFormData = {...formData, [fieldName] : text};
+    setFormData(newFormData);
+  }
 
+  const getPatientId = async () =>{
+    const value = await AsyncStorage.getItem('user_id');
+    setFormData({...formData, 'patient_id': value, id : 1});
+    setPatientId(value);
+  }
 
-    const getPatientId = async () => {
-      try {
-        const value = await AsyncStorage.getItem('user_id');
+  useEffect(()=>{
+    getPatientId();
+  },[]);
 
-        if (value !== null) {
-          setpatientId(value);
-        }
-      } catch (e) {
-        alert('Failed to fetch the input from storage');
-      }
-    }; 
+  useEffect(()=>{
+    if(patientId){
+      getInsuranceData();
+    }
+  },[patientId]);
 
+  const getInsuranceData = async () => {
+    const apiOptions = {
+      endpoint: 'front/api/patient_insurances',
+      data: { patient_id : formData['patient_id'] },
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    // console.log(ApiResp)
+    setFormData({...ApiResp.data});
+    Toast.show({
+      type: 'success',
+      text1: 'Insurance Saved'
+    });
+  }
 
+  const SaveInsuranceApi = async () => {
+    const apiOptions = {
+      endpoint: 'front/api/patient_insurance_save',
+      data: { ...formData },
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    console.log(ApiResp)
 
-
-
- submitInsurance= ()=>{
-
-  AsyncStorage.setItem("insurance_name", insurance_name);
-  AsyncStorage.setItem("subscriber_name", subscriber_name);
-  AsyncStorage.setItem("identification_number", identification_no);
-  AsyncStorage.setItem("group_number", group_no);
-  AsyncStorage.setItem("rxbin", rx_bin);
-  AsyncStorage.setItem("rxpcn", rx_pcn);
-  AsyncStorage.setItem("rxgrp", rx_grp);
+    Toast.show({
+      type: 'success',
+      text1: 'Insurance Saved'
+    });
+  }
   
-  navigation.navigate("TermScreen",{request_type: request_type});
-}
+  const SaveInsurance = async () =>{
+    setsubmitted(true);
+    if(
+      formData['patient_id'] && 
+      formData['insurance_name'] && 
+      formData['subscriber_name'] && 
+      formData['identification_no'] && 
+      formData['group_number'] && 
+      formData['rxbin'] && 
+      formData['rxgrp'] && 
+      formData['rxpcn']
+    ){
+      SaveInsuranceApi();
 
-skipInsurance= ()=>{
-  navigation.navigate("TermScreen",{request_type: request_type});
-}
+    }
+  }
 
 
-const onRefresh = () => {
-    // setAllergyApi([]);
-    // getPatientAllergy();
+  const focusNextInput = (nextInputRef) => {
+    nextInputRef.focus();
   };
 
-useEffect(() => {
-  getPatientId();
- }, [patientId]);
-
-    
-  return (
-
-  	  <Container>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-            <ImageBackground source={images.full_bg_img_hospital} resizeMode='cover'>
-                <View style={Style.setheaderspacepadding}>
-                    <AppHeader
-                        leftImage={images.back_image}
-                        title="Insurance Information"
-                        onLeftPress={() => navigation.navigate('DocumentScreen',{request_type: request_type})} />
-                </View>
-                <ScrollView>
-                    <View style={Styles.container_insurance}>
-                        <View style={Style.minviewallcontent}>
-
-                          <Input
-                              placeholder="Insurance Name"
-                              onChangeText={(insurance_name) => setinsurance_name(insurance_name)}
-                              value={insurance_name}
-                              inputStyle={Style.inputMobile}
-                          />
-                            
-                 
-                    <View style={Styles.inputviewstyle}>
-                         <Input
-                              placeholder="Subscriber Name"
-                              onChangeText={(subscriber_name) => setsubscriber_name(subscriber_name)}
-                              value={subscriber_name}
-                              inputStyle={Style.inputMobile}
-                           />
-                      </View>
-
-                      <View style={Styles.inputviewstyle}>
-                        <Input
-                              placeholder="Identification number"
-                              onChangeText={(identification_no) => setidentification_no(identification_no)}
-                              value={identification_no}
-                              inputStyle={Style.inputMobile}
-                          />
-                       </View>   
-
-                      <View style={Styles.inputviewstyle}> 
-                        <Input
-                            placeholder="Group Number"
-                            onChangeText={(group_no) => set_group_no(group_no)}
-                            value={group_no}
-                            inputStyle={Style.inputMobile}
-                        />
-                     </View>
-
-                     <View style={Styles.inputviewstyle}>
-                      <Input
-                          placeholder="RxBIN"
-                          onChangeText={(rx_bin) => set_rx_bin(rx_bin)}
-                          value={rx_bin}
-                          inputStyle={Style.inputMobile}
-                       />
-                      </View> 
-
-                     <View style={Styles.inputviewstyle}> 
-                      <Input
-                          placeholder="RxPCN"
-                          onChangeText={(rx_pcn) => set_rx_pcn(rx_pcn)}
-                          value={rx_pcn}
-                          inputStyle={Style.inputMobile}
-                      />
-                     </View> 
-
-                    <View style={Styles.inputviewstyle}>  
-                      <Input
-                          placeholder="RxGrp"
-                          onChangeText={(rx_grp) => set_rx_grp(rx_grp)}
-                          value={rx_grp}
-                          inputStyle={Style.inputMobile}
-                      />
-                        </View> 
-    
-                      <Button
-                          title="Save and Next"
-                          onPress={() => this.submitInsurance()}
-                          style={Styles.button} />
-
-                        <Text></Text>  
-
-
-                        <Button
-                          title="Skip"
-                          onPress={() => this.skipInsurance()}
-                          style={Styles.button} />
-                       
-                    </View>
-                    </View>
-                </ScrollView>
-            </ImageBackground>
-
-             
-        </Container>
-  );
-};
-
-const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 32,
-  },
-  buttonStyle: {
-    height: 54,
-    width: '80%',
-    marginTop: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2EE59D',
-    shadowRadius: 5,
-    shadowOpacity: 0.7,
-    shadowColor: 'rgba(46, 229, 157, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-  },
-  buttonTextStyle: {
-    color: 'red',
-    fontWeight: '700',
-  },
-dropdown: {
-      height: 40,
-      borderColor: 'grey',
-      borderWidth: 0.5,
-      paddingHorizontal: 8,
-      backgroundColor: '#fff',
-      borderRadius:10,
-      marginTop: 0,
-      marginBottom: 15,
-      width:'100%'
-
-    },
-    symptomsText:{
-       fontSize: 18,
-       marginBottom: 15,
-       color:'#152549',
-    },
- modal: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#e3f2f0',
-    padding: 30,
-  },
-  text: {
-    color: '#3f2949',
-    marginTop: 10,
-  },
-  card_container: {
-    flex: 0.5,
-    justifyContent: 'center',
-    padding: 0,
-    
-  },
-    paragraph: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      padding: 20
-    },
-    item: {
-    backgroundColor: '#eee',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-
-  },
-  item_delete:{
-    width:'10%',
-    fontSize: 28,
-  },
-  listitems: {
-    width: "100%",
-    flex:1,
-    marginTop: 5,
-    backgroundColor: "#eee",
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent:'space-between'
-},
-button_two: {
-    width: "100%",
-    alignItems: 'flex-end',
+  const getInputValue = (inputName) => {
+    const InpVal = formData[inputName] ? formData[inputName] : '';
+    return InpVal;
 }
-});
+
+  return(
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+         
+          <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '100%', alignItems: 'center', justifyContent: 'flex-start'}}>
+           
+            
+            <TextInput placeholder="Inaurnance Name" value={getInputValue('insurance_name')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'insurance_name')}  returnKeyType="next" onSubmitEditing={() => focusNextInput(suscriberInputRef)} />
+            {(submitted && !formData['insurance_name']) && <Text style={errorStyle}>Inaurnance Name is Required</Text>}
+            <View style={spacer}></View>
+            <TextInput placeholder="Suscriber Name" value={getInputValue('subscriber_name')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'subscriber_name')} ref={(input) => (suscriberInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(IdentificationInputRef)} />
+            {(submitted && !formData['subscriber_name']) && <Text style={errorStyle}>Suscriber Name is Required</Text>}
+            <View style={spacer}></View>
+            <TextInput placeholder="Identification" value={getInputValue('identification_no')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'identification_no')} ref={(input) => (IdentificationInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(groupInputRef)} />
+            {(submitted && !formData['identification_no']) && <Text style={errorStyle}>Identification is Required</Text>}
+           
+            <View style={spacer}></View>
+            <TextInput placeholder="Group Number" value={getInputValue('group_number')}   style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'group_number')} ref={(input) => (groupInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(rxbinInputRef)}/>
+            {(submitted && !formData['group_number']) && <Text style={errorStyle}>Group Number is Required</Text>}
+            <View style={spacer}></View>
+            <TextInput placeholder="RXBIN" value={getInputValue('rxbin')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'rxbin')} ref={(input) => (rxbinInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(rxgrpInputRef)}/>
+            {(submitted && !formData['rxbin']) && <Text style={errorStyle}>RXBIN is Required</Text>}
+            <View style={spacer}></View>
+
+            <TextInput value={getInputValue('rxgrp')} placeholder="RXGRP" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'rxgrp')} ref={(input) => (rxgrpInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(rxpcnInputRef)}/>
+            {(submitted && !formData['rxgrp']) && <Text style={errorStyle}>RXGRP is Required</Text>}
+
+            <TextInput value={getInputValue('rxpcn')} placeholder="RXPCN" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'rxpcn')} ref={(input) => (rxpcnInputRef = input)} returnKeyType="done"/>
+            {(submitted && !formData['rxpcn']) && <Text style={errorStyle}>RXPCN is Required</Text>}
+            
+ 
+            <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+              <TouchableOpacity style={buttonStyle} onPress={SaveInsurance}>
+                <Text style={buttonTextStyle}>Save</Text>
+              </TouchableOpacity>
+             
+              
+             
+            </View>
+          </View>
+         </View>
+  )
+}
+
+const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
+const buttonTextStyle = {color: '#fff', fontSize: 14};
+const saperator = {backgroundColor: '#fff', padding: 10}
+const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
+const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
+const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
+const spacer = {padding: 10}
+const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 
 export default InsuranceScreen;
