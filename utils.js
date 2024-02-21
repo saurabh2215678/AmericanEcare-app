@@ -52,6 +52,11 @@ export const SideBarData = [
                 name: 'Immunization',
                 icon: 'linode',
                 navigateTo: null
+            },
+            {
+                name: 'Medication',
+                icon: 'leaf',
+                navigateTo: 'MedicationScreen'
             }
         ]
     }
