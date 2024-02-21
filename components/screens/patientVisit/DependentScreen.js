@@ -48,8 +48,6 @@ const DependentScreen = () =>{
       data: { patient_id : patientId }
     }
     const ApiResp = await HitApi(apiOptions);
-    console.log('getting dep api')
-    console.log(ApiResp)
     setDependentList(ApiResp);
   }
 
