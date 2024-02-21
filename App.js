@@ -14,25 +14,16 @@ import { View } from "react-native";
 import DependentScreen from "./components/screens/patientVisit/DependentScreen";
 import InsuranceScreen from "./components/screens/patientVisit/InsuranceScreen";
 import Toast from 'react-native-toast-message';
-<<<<<<< HEAD
 import DateAndTimeScreen from "./components/screens/patientVisit/DateAndTimeScreen";
 import ScheduleScreen from "./components/screens/patientVisit/ScheduleScreen";
 import MyVisitScreen from "./components/screens/MyVisitScreen";
 import PharmacyScreen from "./components/screens/patientVisit/PharmacyScreen";
-=======
 import Login from "./components/screens/Login";
-<<<<<<< HEAD
->>>>>>> f9f40ab2d5d9b774a4951d11e41c1109729938c6
-=======
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { Provider } from 'react-redux';
 import store from './components/store/index';
 import { useDispatch, useSelector } from 'react-redux';
 import { logIn } from "./components/store/userSlice";
-import PharmacyScreen from "./components/screens/patientVisit/PharmacyScreen";
-
->>>>>>> cc29c5783b0e83758319624d1d240ca3e009f5f0
 const Drawer = createDrawerNavigator();
 
 
@@ -52,9 +43,8 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="MyVisitScreen" component={MyVisitScreen} />
         <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
         <Drawer.Screen name="Login" component={Login} />
-        <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
       </Drawer.Navigator>
-      <Toast style={{zIndex: 99999}}/>
+      <Toast style={{zIndex: 99999999999}}/>
     </View>
     );
   };
