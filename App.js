@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { NavigationContainer, createNavigationContainerRef } from "@react-navigation/native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -21,19 +21,20 @@ import MyVisitScreen from "./components/screens/MyVisitScreen";
 import PharmacyScreen from "./components/screens/patientVisit/PharmacyScreen";
 =======
 import Login from "./components/screens/Login";
+<<<<<<< HEAD
 >>>>>>> f9f40ab2d5d9b774a4951d11e41c1109729938c6
+=======
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { Provider } from 'react-redux';
+import store from './components/store/index';
+import { useDispatch, useSelector } from 'react-redux';
+import { logIn } from "./components/store/userSlice";
+import PharmacyScreen from "./components/screens/patientVisit/PharmacyScreen";
+
+>>>>>>> cc29c5783b0e83758319624d1d240ca3e009f5f0
 const Drawer = createDrawerNavigator();
 
-console.log('h')
-function Root() {
-  return (
-    <Drawer.Navigator useLegacyImplementation>
-      <Drawer.Screen name="DashboardScreen" component={HomeTabNavigator} />
-      <Drawer.Screen name="EditProfileScreen" component={EditProfileScreen} />
-      <Stack.Screen name="ChangePasswordScreen" component={ChangePasswordScreen} />
-    </Drawer.Navigator>
-  );
-}
 
 const NewDrawerNavigator = () => {
 
@@ -51,21 +52,41 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="MyVisitScreen" component={MyVisitScreen} />
         <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
         <Drawer.Screen name="Login" component={Login} />
+        <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999}}/>
     </View>
     );
   };
 
+const AppLayer = () =>{
+  const storeUser = useSelector((state) => state.user.userData)
+  const dispatch = useDispatch();
+
+  const getUser = async () => {
+    const user = await AsyncStorage.getItem("user_data");
+    dispatch(logIn(user));
+  }
+
+  useEffect(()=>{
+      getUser();
+  },[]);
+
+
+  return(
+    <NavigationContainer style={{paddingBottom: 10}}>
+        {storeUser ? <NewDrawerNavigator/> :
+        <StackNavigator />}
+    </NavigationContainer>
+  )
+}
+
 export default function App() {
   return (
-    <>
-    <NavigationContainer style={{paddingBottom: 10}}>
-        <NewDrawerNavigator/>
-        {/* <StackNavigator /> */}
-    </NavigationContainer>
+    <Provider store={store}>
+      <AppLayer/>
     {/* <StackNavigator /> */}
-    </>
+    </Provider>
   );
 }
 
