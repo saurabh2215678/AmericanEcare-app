@@ -25,6 +25,7 @@ import store from './components/store/index';
 import { useDispatch, useSelector } from 'react-redux';
 import { logIn } from "./components/store/userSlice";
 import MedicationScreen from "./components/screens/patientVisit/MedicationScreen";
+import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 const Drawer = createDrawerNavigator();
 
 
@@ -66,10 +67,12 @@ const AppLayer = () =>{
 
 
   return(
-    <NavigationContainer style={{paddingBottom: 10}}>
-        {storeUser ? <NewDrawerNavigator/> :
-        <StackNavigator />}
-    </NavigationContainer>
+    <AutocompleteDropdownContextProvider>
+      <NavigationContainer style={{paddingBottom: 10}}>
+          {storeUser ? <NewDrawerNavigator/> :
+          <StackNavigator />}
+      </NavigationContainer>
+    </AutocompleteDropdownContextProvider>
   )
 }
 
