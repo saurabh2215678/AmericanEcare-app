@@ -26,6 +26,7 @@ import store from './components/store/index';
 import { useDispatch, useSelector } from 'react-redux';
 import { logIn } from "./components/store/userSlice";
 import MedicationScreen from "./components/screens/patientVisit/MedicationScreen";
+import PastSurgeryScreen from "./components/screens/patientVisit/PastSurgeryScreen";
 import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 const Drawer = createDrawerNavigator();
 
@@ -47,6 +48,7 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="MyVisitScreen" component={MyVisitScreen} />
         <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
         <Drawer.Screen name="MedicationScreen" component={MedicationScreen} />
+        <Drawer.Screen name="PastSurgeryScreen" component={PastSurgeryScreen} />
         <Drawer.Screen name="Login" component={Login} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999999999}}/>
