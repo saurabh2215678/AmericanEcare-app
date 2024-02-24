@@ -46,12 +46,17 @@ export const SideBarData = [
             {
                 name: 'Pharmacy',
                 icon: 'hospital-o',
-                navigateTo: null
+                navigateTo: 'PharmacyScreen'
             },
             {
                 name: 'Immunization',
                 icon: 'linode',
                 navigateTo: 'ImmunizationScreen'
+            },
+            {
+                name: 'Medication',
+                icon: 'leaf',
+                navigateTo: 'MedicationScreen'
             }
         ]
     }

@@ -13,8 +13,11 @@ import { useNavigation } from "@react-navigation/native";
 //import Loader from "./Components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SH, Strings } from './utils';
+import { useDispatch } from 'react-redux';
+import { logIn } from "../store/userSlice";
 
 const Login = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,6 +75,9 @@ const Login = ({ navigation }) => {
 
       // console.log("Middle",responseJson.data.state);
 
+          dispatch(logIn(responseJson.data));
+
+          AsyncStorage.setItem("user_data", JSON.stringify(responseJson.data));
           AsyncStorage.setItem("user_id", JSON.stringify(responseJson.data.id));
           
           AsyncStorage.setItem("first_name", responseJson.data.first_name);

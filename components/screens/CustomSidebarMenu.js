@@ -19,9 +19,12 @@ import { sidebarUserStyle } from '../../styles/sidebarStyle';
 import { useNavigation } from '@react-navigation/native';
 import { SideBarData } from '../../utils';
 import NavigationItem from './components/commonComponents/NavigationItem';
+import { useDispatch } from 'react-redux';
+import { logOut } from '../store/userSlice';
 
 const CustomSidebarMenu = (props) => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
     const [isSubMenuOpen, setSubMenuOpen] = useState(false);
     const [isMyHealthOpen, setMyHealthOpen] = useState(false);
 
@@ -86,6 +89,7 @@ const CustomSidebarMenu = (props) => {
 
  logout=()=>{
     AsyncStorage.clear();
+    dispatch(logOut());
     navigation.navigate('Login')
   }
 
