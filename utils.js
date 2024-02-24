@@ -13,7 +13,7 @@ export const SideBarData = [
         icon: 'user-circle',
         submenu:[
             {
-                name: 'Personal Information',
+                name: 'Personal Information x',
                 icon: 'id-card',
                 navigateTo: 'EditProfileScreen'
             },
@@ -51,7 +51,7 @@ export const SideBarData = [
             {
                 name: 'Immunization',
                 icon: 'linode',
-                navigateTo: null
+                navigateTo: 'ImmunizationScreen'
             }
         ]
     }
