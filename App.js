@@ -60,7 +60,7 @@ const AppLayer = () =>{
 
   const getUser = async () => {
     const user = await AsyncStorage.getItem("user_data");
-    dispatch(logIn(user));
+    dispatch(logIn(JSON.parse(user)));
   }
 
   useEffect(()=>{
