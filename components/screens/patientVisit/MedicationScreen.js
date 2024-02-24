@@ -67,10 +67,10 @@ const MedicationScreen = () => {
   }
 
   const deleteMedication = async (id) => {
-    const userObj = JSON.parse(storeUser);
+
     const apiOptions = {
       endpoint: 'front/api/deleteMedication',
-      data: {patient_id : userObj.id, id},
+      data: {patient_id : storeUser.id, id},
       withStatus: true
     }
     const ApiResp = await HitApi(apiOptions);
@@ -100,11 +100,10 @@ const MedicationScreen = () => {
   }
 
   const saveMedicationApi = async () =>{
-    const userObj = JSON.parse(storeUser);
     const apiOptions = {
       endpoint: 'front/api/saveMedication',
       data: { 
-        patient_id : userObj.id,
+        patient_id : storeUser.id,
         drug_id: selectedDrug.data.id,
         strength: selectedStrength.label
       },
@@ -145,8 +144,7 @@ const MedicationScreen = () => {
 
   useEffect(()=>{
     if(storeUser){
-      const userObj = JSON.parse(storeUser);
-      getMedicationList(userObj.id);
+      getMedicationList(storeUser.id);
     }
   },[storeUser]);
 
