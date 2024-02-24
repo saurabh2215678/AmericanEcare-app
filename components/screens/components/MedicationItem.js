@@ -2,17 +2,16 @@ import { View, Text, TouchableOpacity } from "react-native"
 import { Card } from "react-native-paper";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const MedicationItem = ({data}) =>{
+const MedicationItem = ({data, deleteMedication}) =>{
     return(
         <Card style={pahrmecyItemStyle}>
-            <Text>Medication Name: </Text>
             <View style={wrapperStyle}>
                 <View style={starStyle}>
-                    <Text>Address : </Text>
-                    <Text>Zip : </Text>
+                    <Text>Drug Name : {data['drugs_name']}</Text>
+                    <Text>Strength : {data['strength']}</Text>
                 </View>
                 <View>
-                    <TouchableOpacity onPress={()=>{}}>
+                    <TouchableOpacity onPress={()=>deleteMedication(data.id)}>
                         <Icon name="trash" size={20} color="red" />
                     </TouchableOpacity>
                 </View>

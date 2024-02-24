@@ -5,28 +5,158 @@ import MedicationItem from "../components/MedicationItem";
 import { useEffect, useState } from "react";
 import ModalSelector from 'react-native-modal-selector-searchable'
 import { Picker } from "@react-native-picker/picker";
+import { HitApi } from "../../../utils";
+import { useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
 
 
 const MedicationScreen = () => {
+  const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [medicationList, setMedicationList] = useState([]);
   const [medicationDropdownList, setMedicationDropdownList] = useState([]);
-  const [textInputValue, setTextInputValue] = useState('');
+  const [medicationDropdownListState, setMedicationDropdownListState] = useState('loaded');
+  const [drugDropdownList, setDrugDropdownList] = useState([]);
+  const [drugDropdownListState, setDrugDropdownListState] = useState('loaded');
   const [selectBox, setselectBox] = useState();
+  const [searchText, setSearchText] = useState('');
+  const [selectedDrug, setSelectedDrug] = useState();
+  const [selectedStrength, setSelectedStrength] = useState();
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  const [submitted, setsubmitted] = useState(false);
 
+  const populateDrugsDropDown = async () => {
+    setMedicationDropdownListState('loading')
+    const apiOptions = {
+      endpoint: 'front/api/search_medication_with_keywords',
+      data: { searchTerm : searchText}
+    }
+    const ApiResp = await HitApi(apiOptions);
 
-  let index = 0;
-  const data = [
-      { key: index++, section: true, label: 'Fruits' },
-      { key: index++, label: 'Red Apples' },
-      { key: index++, label: 'Cherries' },
-      { key: index++, label: 'Cranberries', accessibilityLabel: 'Tap here for cranberries' },
-      { key: index++, label: 'Vegetable', customKey: 'Not a fruit' }
-  ];
+    if(ApiResp.length > 1){
+      let index = 0;
+      const dpdata = [];
+      ApiResp.forEach(element => {
+        const modifiedItem = {key: index++, label: element.text, data: element};
+        dpdata.push(modifiedItem);
+      });
+      // console.log('ApiResp ==', dpdata);
+        setMedicationDropdownList(dpdata);
+    }
+    setMedicationDropdownListState('loaded')
+  }
+
+  const populateStrengthDropDown = async () => {
+    setDrugDropdownListState('loading')
+    const apiOptions = {
+      endpoint: 'front/api/getDrugStrength',
+      data: { DrugNameID : selectedDrug.data.id}
+    }
+    const ApiResp = await HitApi(apiOptions);
+
+    if(ApiResp.length > 0){
+      let index = 0;
+      const dpdata = [];
+      ApiResp.forEach(element => {
+        const modifiedItem = {key: index++, label: element.text, data: element};
+        dpdata.push(modifiedItem);
+      });
+      setDrugDropdownList(dpdata);
+    }
+    setDrugDropdownListState('loaded')
+  }
+
+  const deleteMedication = async (id) => {
+    const userObj = JSON.parse(storeUser);
+    const apiOptions = {
+      endpoint: 'front/api/deleteMedication',
+      data: {patient_id : userObj.id, id},
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    getMedicationList(userObj.id);
+  }
+
+  const getMedicationList = async (userId) => {
+    const apiOptions = {
+      endpoint: 'front/api/getMedication',
+      data: {patient_id : userId },
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    if(ApiResp?.status === 'success'){
+      Toast.show({
+        type: 'success',
+        text1: "Successfully Get List"
+      });
+
+      setMedicationList(ApiResp.data);
+    }else{
+      Toast.show({
+        type: 'error',
+        text1: "Something went wrong"
+      });
+    }
+  }
+
+  const saveMedicationApi = async () =>{
+    const userObj = JSON.parse(storeUser);
+    const apiOptions = {
+      endpoint: 'front/api/saveMedication',
+      data: { 
+        patient_id : userObj.id,
+        drug_id: selectedDrug.data.id,
+        strength: selectedStrength.label
+      },
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setAddMoal(false);
+    if(ApiResp?.status === 'success'){
+      Toast.show({
+        type: 'success',
+        text1: "Successfully Saved"
+      });
+      getMedicationList(userObj.id);
+    }else{
+      Toast.show({
+        type: 'error',
+        text1: "Something went wrong"
+      });
+    }
+  }
 
   useEffect(()=>{
-    console.log('txt value', textInputValue)
-  },[textInputValue]);
+    if(searchText.length > 1){
+      populateDrugsDropDown();
+    }else{
+      setDrugDropdownList([]);
+      setMedicationDropdownList([]);
+    }
+  },[searchText]);
+
+  useEffect(()=>{
+    if (!isFirstRender) {
+      populateStrengthDropDown();
+    } else {
+      setIsFirstRender(false);
+    }
+  },[selectedDrug]);
+
+  useEffect(()=>{
+    if(storeUser){
+      const userObj = JSON.parse(storeUser);
+      getMedicationList(userObj.id);
+    }
+  },[storeUser]);
+
+
+  const saveMedication = async () => {
+    setsubmitted(true);
+    if(selectedDrug && selectedStrength){
+      saveMedicationApi();
+    }
+  }
 
 
 
@@ -41,7 +171,7 @@ const MedicationScreen = () => {
         </TouchableOpacity>
 
         <View>
-          {medicationList.map((item, index)=><MedicationItem key={index} data={item}/>)}
+          {medicationList.map((item, index)=><MedicationItem key={index} data={item} deleteMedication={deleteMedication}/>)}
         </View>
       </ScrollView>
       <Modal
@@ -55,8 +185,6 @@ const MedicationScreen = () => {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
                 <Text style={headlineStyle}>Add Medication</Text>
-
-                {/* <TextInput placeholder="Your Zip Code" value={zipCode} style={InputStyle} onChangeText={(text)=>setZipCode(text)}  returnKeyType="done" /> */}
                 <View style={spacer}></View>
                 <View style={selectWrapper}>
 
@@ -70,28 +198,68 @@ const MedicationScreen = () => {
                     <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
  
                   </Picker>
-                  <ModalSelector
-                      data={medicationDropdownList}
-                      initValue="Select Medication"
+
+                    <TextInput placeholder="Select medication" value={searchText} style={InputStyle} onChangeText={(text)=>setSearchText(text)}  returnKeyType="done" />
+                  <View style={spacer}></View>
+                  {(medicationDropdownListState === 'loading') && <Text>Loading...</Text>}
+                   {((medicationDropdownList.length > 0) && (searchText.length > 1) && (medicationDropdownListState !== 'loading')) && 
+                   <>
+                      <ModalSelector
+                        data={medicationDropdownList}
+                        initValue="Select Drugs"
+                        supportedOrientations={['landscape']}
+                        accessible={true}
+                        value={selectedDrug?.data?.text}
+                        placeHolderTextColor="red"
+                        scrollViewAccessibilityLabel={'Scrollable options'}
+                        cancelButtonAccessibilityLabel={'Cancel Button'}
+                        onChange={(val)=>setSelectedDrug(val)}
+                        optionContainerStyle = {bgWhiteStyle}
+                        optionStyle = {bgWhiteStyle}
+                        sectionStyle = {bgWhiteStyle}
+                        cancelStyle = {bgWhiteStyle}
+                        searchStyle = {bgWhiteStyle}
+                        >
+
+                    </ModalSelector>
+                    <View style={spacer}></View>
+                   </>
+                   }
+
+                  {(drugDropdownListState === 'loading') && <Text>Loading...</Text>}
+                   {((drugDropdownList.length > 0) && (drugDropdownListState !== 'loading')) && 
+                    <>
+                    <ModalSelector
+                      data={drugDropdownList}
+                      initValue="Select Strength"
                       supportedOrientations={['landscape']}
                       accessible={true}
+                      placeHolderTextColor="red"
                       scrollViewAccessibilityLabel={'Scrollable options'}
                       cancelButtonAccessibilityLabel={'Cancel Button'}
-                      onChange={(option)=>{ setTextInputValue(option.label)}}
+                      value={selectedStrength}
+                      onChange={(val)=>setSelectedStrength(val)}
                       optionContainerStyle = {bgWhiteStyle}
                       optionStyle = {bgWhiteStyle}
                       sectionStyle = {bgWhiteStyle}
                       cancelStyle = {bgWhiteStyle}
                       searchStyle = {bgWhiteStyle}
                       >
+                    </ModalSelector>
+                    <View style={spacer}></View>
+                    </>
+                  }
 
-                      <TextInput
-                          style={{borderWidth:1, borderColor:'#ccc', padding:10}}
-                          editable={false}
-                          placeholder="Select something yummy!"
-                          value={textInputValue} />
-
-                  </ModalSelector>
+                <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                  <TouchableOpacity style={buttonStyle} onPress={saveMedication}>
+                    <Text style={buttonTextStyle}>Save</Text>
+                  </TouchableOpacity>
+                  <View style={saperator}></View>
+                  <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
+                    <Text style={buttonTextStyle}>Cancel</Text>
+                  </TouchableOpacity>
+                
+                </View>
                   
                 </View>
 
@@ -114,6 +282,6 @@ const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 const optionStyle = { fontSize: 14 }
 const selectStyle = {margin: -16, marginBottom: -8}
-const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative', borderBottomWidth:1, borderColor: '#ababab', }
+const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
 const bgWhiteStyle = {backgroundColor: '#fff'}
 // const dropdownStyle = {width: 'calc(100% - 0.5)'}
