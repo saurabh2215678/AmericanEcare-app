@@ -75,7 +75,9 @@ const SaveImmunzation = async () =>{
 // console.log(immunzation + "ty")
 // console.log(getInputValue('immunzation' + 'dddd'));
   return (
+    
     <View style={styles.container}>
+      <Text style={{paddingTop: 20,}}>Patient Immunization</Text>
     <TextInput value={getInputValue('imunization')}  placeholder="Immunzation" style={InputStyle}  onChangeText={(text)=> { handleTextChange(text, 'imunization'); }} 
     returnKeyType="done"
     />
@@ -95,7 +97,7 @@ const SaveImmunzation = async () =>{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    
     alignItems: 'center',
   },
 });
