@@ -157,7 +157,7 @@ const CustomSidebarMenu = (props) => {
                          </TouchableOpacity>  
 
                          <TouchableOpacity onPress={handleSubMenuClick}> 
-                           <Text>Immunization</Text>
+                           <Text>Immunization 1r</Text>
                          </TouchableOpacity>  
 
                          <TouchableOpacity onPress={handleSubMenuClick}> 

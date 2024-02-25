@@ -52,6 +52,7 @@ export const SideBarData = [
                 name: 'Immunization',
                 icon: 'linode',
                 navigateTo: 'ImmunizationScreen'
+             
             },
             {
                 name: 'Medication',
@@ -62,6 +63,11 @@ export const SideBarData = [
                 name: 'Allergy',
                 icon: 'forumbee',
                 navigateTo: 'AllergyScreen'
+            },
+            {
+                name: 'Past Surgery Histroy',
+                icon: 'leaf',
+                navigateTo: 'PastSurgeryScreen'
             }
         ]
     }

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { Text, View, TextInput } from "react-native"
 import { HitApi } from "../../../utils";
-import Toast from "react-native-toast-message";
 
 const InsuranceScreen = ()=>{
 
@@ -41,6 +40,10 @@ const InsuranceScreen = ()=>{
     const ApiResp = await HitApi(apiOptions);
     // console.log(ApiResp)
     setFormData({...ApiResp.data});
+    Toast.show({
+      type: 'success',
+      text1: 'Insurance Saved'
+    });
   }
 
   const SaveInsuranceApi = async () => {
@@ -86,7 +89,7 @@ const InsuranceScreen = ()=>{
 }
 
   return(
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    <View style={{flex: 1, alignItems: 'center',}}>
          
           <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '100%', alignItems: 'center', justifyContent: 'flex-start'}}>
            
