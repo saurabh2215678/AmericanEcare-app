@@ -57,6 +57,11 @@ export const SideBarData = [
                 name: 'Medication',
                 icon: 'leaf',
                 navigateTo: 'MedicationScreen'
+            },
+            {
+                name: 'Allergy',
+                icon: 'forumbee',
+                navigateTo: 'AllergyScreen'
             }
         ]
     }
