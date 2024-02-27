@@ -60,6 +60,11 @@ export const SideBarData = [
                 navigateTo: 'MedicationScreen'
             },
             {
+                name: 'Allergy',
+                icon: 'forumbee',
+                navigateTo: 'AllergyScreen'
+            },
+            {
                 name: 'Past Surgery Histroy',
                 icon: 'leaf',
                 navigateTo: 'PastSurgeryScreen'

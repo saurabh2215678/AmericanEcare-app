@@ -74,7 +74,7 @@ const MedicationScreen = () => {
       withStatus: true
     }
     const ApiResp = await HitApi(apiOptions);
-    getMedicationList(userObj.id);
+    getMedicationList(storeUser.id);
   }
 
   const getMedicationList = async (userId) => {
@@ -111,12 +111,15 @@ const MedicationScreen = () => {
     }
     const ApiResp = await HitApi(apiOptions);
     setAddMoal(false);
+    setMedicationDropdownList([]);
+    setDrugDropdownList([]);
+    setSearchText('');
     if(ApiResp?.status === 'success'){
       Toast.show({
         type: 'success',
         text1: "Successfully Saved"
       });
-      getMedicationList(userObj.id);
+      getMedicationList(storeUser.id);
     }else{
       Toast.show({
         type: 'error',
@@ -151,8 +154,14 @@ const MedicationScreen = () => {
 
   const saveMedication = async () => {
     setsubmitted(true);
-    if(selectedDrug && selectedStrength){
+    const submitCondition = selectedDrug && selectedStrength && (medicationDropdownList.length > 0) && (drugDropdownList.length > 0) && (searchText.length > 1)
+    if(submitCondition){
       saveMedicationApi();
+    }else{
+      Toast.show({
+        type: 'error',
+        text1: "Something went wrong"
+      })
     }
   }
 

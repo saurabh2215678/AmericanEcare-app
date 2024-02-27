@@ -1,584 +1,156 @@
-import React, { useState,useEffect } from 'react';
-import {View, Text, StyleSheet,TextInput,StatusBar,ScrollView, Pressable,ImageBackground,Alert,TouchableOpacity,SafeAreaView,Modal,FlatList,RefreshControl} from 'react-native';
-import {Container,AppHeader,Input,Button} from '../components';
-import Styles from '../styles/LoginRegiesterStyle/RegisterScreenStyle';
-import Style from '../styles/CommonStyle/Style';
-import images from '../images';
-//import { useSelector } from "react-redux";
-import { SH, Strings } from '../utils';
-import { Dropdown } from 'react-native-element-dropdown';
-//import AntDesign from '@expo/vector-icons/AntDesign';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from 'axios';
+import { Keyboard, Modal, Pressable, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View} from "react-native";
+import { Container } from "../components/index";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { useEffect, useState } from "react";
+import AllergyItem from "../components/AllergyItem";
+import { Picker } from "@react-native-picker/picker";
+import { HitApi } from "../../../utils";
+import ModalSelector from "react-native-modal-selector-searchable";
 
+const AllergyScreen = () => {
+  const [addModal, setAddMoal] = useState(false);
+  const [allergyList, setAllergyList] = useState([]);
+  const [selectBox, setselectBox] = useState();
+  const [allergyDropDownList, setAllergyDropDownListList] = useState([]);
+  const [selectedAllergy, setselectedAllergy] = useState();
 
-const AllergyScreen = ({route,navigation}) => {
-    const API_URL = Strings.baseUrl.url;
-   
-    const [DisplayAlert, setDisplayAlert] = useState(0)
-    const [dieaseData, setdieaseData] = useState([]);
-    const [diease, setUserdiease] = useState([]);
-    const [AllergyApi, setAllergyApi] = useState([]);
-    const [keyword, setkeyword] = useState("");
-    const [notes, setNotes] = useState("");
-    const [drugId, setdrugId] = useState(0);
-    const [ReactionData, setReactionData] = useState([]);
-    const [Reaction, setUserReaction] = useState("");
-    const [allergyData, setallergyData] = useState([]);
-    const [SevertityData, setSevertityData] = useState([]);
-    const [allergy, setUserAllergy] = useState("");
-    const [Severtity, setUserSevertity] = useState("");
-    const [drugStrengthData, setdrugStrength] = useState([]);
-    const [drugStrength, setUserdrugStrength] = useState([]);
-    const [patientId, setpatientId] = useState("");
-   
-   // const [visitTypes, setuservisitTypes] = useState('');
-    const [value, setValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [refreshing, setRefreshing] = useState(true);
-    const { request_type} = route.params;
+  const getAllergyList = async () => {
 
-
-
-const get_allergy_by_keywords = ()=>{
-
-  let axiosConfig = {
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-      };
-  const body = { search_keywords: keyword };
-  
-   axios.post(API_URL+'front/api/get_allergy_by_keywords', body, axiosConfig)
-             .then((responseJson) => {
-
-    var allergy_count = Object.keys(responseJson.data.data).length;
-    let allergyArray = [];
-    for (var i = 0; i < allergy_count; i++) {
-      allergyArray.push({
-        label: responseJson.data.data[i].description,
-        value: responseJson.data.data[i].id,
-      });
+    const apiOptions = {
+      endpoint: 'front/api/getTwentyAllergyList',
+      data: { }
     }
-
-
-  setallergyData(allergyArray);     
-
-  })
-.catch(err => console.log('Search Allergy: ', err));   
-
-}
-
-
-
-const getListOfReaction=()=>{
-
- 
-     var config = {
-          method: 'get',
-          url: API_URL+`front/api/list_of_reaction`,
-          headers: {
-            'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8',
-          },
-        };
-
-        axios(config)
-        .then(response => {
-      
-        var count = Object.keys(response.data.data).length;
-     
-        let reactionArray = [];
-        for (var i = 0; i < count; i++) {
-          reactionArray.push({
-            label: response.data.data[i].reaction_type,
-            value: response.data.data[i].id,
-          });
-        }
-        setReactionData(reactionArray);
-
-        })
-      .catch(error => {
-        console.log("List of Reaction:",error);
+    const ApiResp = await HitApi(apiOptions);
+    if(ApiResp.length > 1){
+      let index = 0;
+      const dpdata = [];
+      ApiResp.forEach(element => {
+        const modifiedItem = {key: index++, label: element['description '], data: element};
+        dpdata.push(modifiedItem);
       });
-
-
-}  
-
-
-const getPatientAllergy = () => {
-    // Function to get the value from AsyncStorage
-         let axiosConfig = {
-              headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-              }
-            };
-            const body = { patient_id: patientId };
-
-            axios.post(API_URL+'front/api/get_patient_allergy', body, axiosConfig)
-             .then((responseJson) => {
-
-                  var history_count = Object.keys(responseJson.data.data).length;
-                  let allergyArray = [];
-                  for (var i = 0; i < history_count; i++) {
-                    allergyArray.push({
-                      id: responseJson.data.data[i].id,
-                      patient_id: responseJson.data.data[i].patient_id,
-                      allergy_for: responseJson.data.data[i].allergy_for,
-                      medical_allergies: responseJson.data.data[i].medical_allergies,
-                      severity_name: responseJson.data.data[i].severity_name,
-                      name: responseJson.data.data[i].name,
-                      reaction_type: responseJson.data.data[i].reaction_type,
-                      notes: responseJson.data.data[i].notes,
-                    });
-                  }
-               setRefreshing(false);
-               setAllergyApi(allergyArray);
-
-                })
-             .catch(err => console.log('Allergy API: ', err));
-        };
-
-
-
-const getPatientId = async () => {
-  try {
-    const value = await AsyncStorage.getItem('user_id');
-
-    if (value !== null) {
-      setpatientId(value);
+        setAllergyDropDownListList(dpdata);
     }
-  } catch (e) {
-    alert('Failed to fetch the input from storage');
-  }
-}; 
-
-
-
-
-const onRefresh = () => {
-    setAllergyApi([]);
-    getPatientAllergy();
-  };
-
-const saveAllergy=()=>{
-  //alert(diease);
-   // navigation.navigate("ReasonScreen");
-   if(allergy=="")
-   {
-    alert("Please Select Allergy");
-    return false;
-   }
-
-   // if(onset_age=="")
-   // {
-   //  alert("Please Enter Age");
-   // }
-
-  setLoading(true); // Set loading before sending API request
-
-   let axiosConfig = {
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-     };
-   
-     const body = {patient_id: patientId, medical_allergies:allergy, medical_severity:Severtity, reaction_type:Reaction,notes:notes};
-
-      axios.post(API_URL+'front/api/save_allergy', body, axiosConfig)
-             .then((responseJson) => {
-
-              if(responseJson.status == 200)
-              {
-                   setLoading(false); // Stop loading
-                   Alert.alert(
-                      'Sucess',
-                      'Allergy has been saved Successfully',
-                      [
-                        {
-                          text: '', 
-                          onPress: () => this.refreshAllergy()
-                        },
-                      ],
-                      {cancelable: false},
-                    );
-
-              }
-            })
-         .catch(err => console.log('Allergy API: ', err));
-
-}
-
-refreshAllergy=(is_delete="")=>{
-  if(is_delete!=1)
-  {
-     setShowModal(!showModal);
-      setLoading(true); 
+    // console.log(ApiResp);
   }
 
-   setLoading(false);
-  
-   getPatientAllergy();
-   navigation.navigate("AllergyScreen",{request_type: request_type});
-}
+  const getAllergyListByKeyword = async (keyword) => {
+
+    const apiOptions = {
+      endpoint: 'front/api/search_allergy_with_keywords',
+      data: { searchTerm :  keyword},
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    if(ApiResp.length > 1){
+      let index = 0;
+      const dpdata = [];
+      ApiResp.forEach(element => {
+        const modifiedItem = {key: index++, label: element['text'], data: element};
+        dpdata.push(modifiedItem);
+      });
+        setAllergyDropDownListList(dpdata);
+    }
+  }
 
 
-const delete_allergy_confirm =(id)=>{
-  return Alert.alert(
-      "Are your sure?",
-      "Are you sure you want to remove this?",
-      [
-        // The "Yes" button
-        {
-          text: "Yes",
-          onPress: () => {
-            delete_allergy(id);
-          },
-        },
-        // The "No" button
-        // Does nothing but dismiss the dialog when tapped
-        {
-          text: "No",
-        },
-      ]
-    );
-}
 
-const delete_allergy =(id)=>{
+  const handleSearchChange = (val) => {
+    getAllergyListByKeyword(val);
+    // console.log('val', val);
+  }
 
-  let axiosConfig = {
-              headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-              }
-            };
-  const body = { id: id };
+  useEffect(()=>{
+    getAllergyList();
+  },[]);
 
+  return(
+    <Container>
+      <ScrollView style={fullDependent}>
+
+      <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>setAddMoal(true)}>
+            <View style={{backgroundColor: '#33BAD8', paddingHorizontal:7, paddingVertical: 6, margin: 8, borderRadius: 3 }}>
+              <Icon name="plus" size={12} color="#ffffff" />
+            </View>
+        </TouchableOpacity>
+        <View>
+          {allergyList.map((item, index)=><AllergyItem key={index} data={item}/>)}
+        </View>
+      </ScrollView>
+      <Modal
+        visible={addModal}
+        animationType="fade"
+        onRequestClose={()=>setAddMoal(false)}
+        useNativeDriver={true}
+        transparent>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setAddMoal(false)}/>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={headlineStyle}>Add Medication</Text>
+                <View style={spacer}></View>
+                <View style={selectWrapper}>
+                <Picker
+                    selectedValue={selectBox}
+                    onValueChange={(itemValue, itemIndex) => setselectBox(itemValue)}
+                    style={selectStyle}
+                  >
+                    <Picker.Item label="Self" value="1" style={optionStyle} />
+                    <Picker.Item label="ghnb, vhhb" value="2" style={optionStyle} />
+                    <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
  
-   axios.post(API_URL+'front/api/delete_allergy', body, axiosConfig)
-             .then((responseJson) => {
+                  </Picker>
+                  <View style={spacer}></View>
+                {/* <Picker
+                    selectedValue={selectedAllergy}
+                    // onValueChange={(itemValue,selectBox itemIndex) => setselectedAllergy(itemValue)}
+                    style={selectStyle}
+                  >
+                    {allergyDropDownList.map((item)=> <Picker.Item key={item['id']} label={item["description "]} value={item['id']} style={optionStyle} />)}
+                    
+ 
+                </Picker> */}
+                <View style={spacer}></View>
+                <ModalSelector
+                        data={allergyDropDownList}
+                        initValue="Select Drugs"
+                        supportedOrientations={['landscape']}
+                        accessible={true}
+                        value={selectedAllergy}
+                        placeHolderTextColor="red"
+                        scrollViewAccessibilityLabel={'Scrollable options'}
+                        cancelButtonAccessibilityLabel={'Cancel Button'}
+                        onChange={(val)=>setselectedAllergy(val)}
+                        optionContainerStyle = {bgWhiteStyle}
+                        optionStyle = {bgWhiteStyle}
+                        sectionStyle = {bgWhiteStyle}
+                        cancelStyle = {bgWhiteStyle}
+                        searchStyle = {bgWhiteStyle}
+                        onChangeSearch = {handleSearchChange}
+                        >
 
-                if(responseJson.status == 200)
-                  {
-                    Alert.alert(
-                      'Sucess',
-                      'Delete Successfully',
-                      [
-                        {text: '', onPress: () => this.refreshAllergy(1)},
-                      ],
-                      {cancelable: false},
-                    );
-                  }
-               
-
-            })
-             .catch(err => console.log('Delete Allergy API: ', err));
-
-};
-
-
-
-useEffect(() => {
-  getPatientId();
-  getPatientAllergy();
-  get_allergy_by_keywords();
-  getListOfReaction();
-
-  setSevertityData([{ label: 'Unknown', value: '1' },{ label: 'Mild', value: '2' },{ label: 'Moderate', value: '3' },{ label: 'severe', value: '4' }]);  
-
-
-}, [patientId]);
-
-    
-  return (
-
-  	 <Container>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-          
-                <View style={Style.setheaderspacepadding}>
-                   <AppHeader
-                        leftImage={images.back_image}
-                        title="Allergy"
-                        onLeftPress={() => navigation.navigate('MedicationScreen',{request_type: request_type})} />
+                    </ModalSelector>
                 </View>
-               
-          <SafeAreaView>
-              <View>
-                <Modal
-                  animationType={'slide'}
-                  transparent={false}
-                  visible={showModal}
-                  onRequestClose={() => {
-                    console.log('Modal has been closed.');
 
-                  }}>
-                 
-                  <View style={styles.modal}>
-                    <Text style={styles.text}>Add Allergy</Text>
 
-                  <Text></Text>
-
-                  <Input
-                      placeholder="Search Allergy By Keyword"
-                      onChangeText={(keyword) => setkeyword(keyword)}
-                      value={keyword}
-                      inputStyle={Style.inputMobile}
-                  />
-
-                <TouchableOpacity onPress={()=>get_allergy_by_keywords()}>
              
-                <Text style={styles.buttonTextStyle}>Click to Search Allergy</Text>
-             
-            </TouchableOpacity>
-
-
-
-
-                     <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        iconStyle={styles.iconStyle}
-                        data={allergyData}
-                        search
-                        maxHeight={200}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={!isFocus ? 'List of allergies' : '...'}
-                        placeholderTextColor="#fff" 
-                        searchPlaceholder="List of allergies..."
-                        value={value}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={item => {
-                          setUserAllergy(item.value);
-                          setIsFocus(false);
-                        }}
-                      />
-
-
-                       <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        iconStyle={styles.iconStyle}
-                        data={SevertityData}
-                        search
-                        maxHeight={200}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={!isFocus ? 'List of severity' : '...'}
-                        placeholderTextColor="#fff" 
-                        searchPlaceholder="List of severity..."
-                        value={value}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={item => {
-                          setUserSevertity(item.value);
-                          setIsFocus(false);
-                        }}
-                      />
-
-                      <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        iconStyle={styles.iconStyle}
-                        data={ReactionData}
-                        search
-                        maxHeight={200}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={!isFocus ? 'Reaction' : '...'}
-                        placeholderTextColor="#fff" 
-                        searchPlaceholder="List of Reaction..."
-                        value={value}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={item => {
-                          setUserReaction(item.value);
-                          setIsFocus(false);
-                        }}
-                      />
-
-
-                  <Input
-                      placeholder="Notes"
-                      onChangeText={(notes) => setNotes(notes)}
-                      value={notes}
-                      inputStyle={Style.inputMobile}
-                  />
-  
-
-                    <Button
-                      title={loading ? 'Loading...' : 'Save'}
-                      onPress={() => {
-                        saveAllergy();
-                      }}
-                    />
-
-                    <Text style={styles.text}></Text>
-
-
-                    <Button
-                      title="Cancel"
-                      onPress={() => {
-                        setShowModal(!showModal);
-                      }}
-                    />
-                  </View>
-                </Modal>
-                {/*Updating the state to make Modal Visible*/}
-                <Button
-                  title="Add Allergy"
-                  onPress={() => {
-                    setShowModal(!showModal);
-                  }}
-                />
-
-                 <Text style={styles.text}></Text>
-
-                 <Button
-                  title="Skip and Next"
-                  onPress={() => {
-                   navigation.navigate("VitalScreen",{request_type: request_type});
-                  }}
-                />
-
-
 
               </View>
-
-            </SafeAreaView>
-        
-
-          <SafeAreaView style={styles.container}>
-                    <FlatList
-                      data={AllergyApi}
-                      renderItem={({item}) =>  (
-                        <View style={styles.listitems}>
-                        <Text> 
-                         Allergy: {item.medical_allergies} {"\n"}
-                         Severity: {item.severity_name}{"\n"}
-                         Reaction: {item.reaction_type}{"\n"}
-                         Note: {item.notes}{"\n"}
-                        </Text> 
-                                  <TouchableOpacity onPress={()=>delete_allergy_confirm(item.id)}>
-                                  <View style={styles.button_two}>
-                                    <Text style={styles.buttonTextStyle}>Delete</Text>
-                                  </View>
-                                </TouchableOpacity>
-                                
-
-                      </View> )
-                      }
-                       refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                        />
-                      }/>
-              </SafeAreaView>
-        </Container>
-  );
-};
-
-const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 32,
-  },
-  buttonStyle: {
-    height: 54,
-    width: '80%',
-    marginTop: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2EE59D',
-    shadowRadius: 5,
-    shadowOpacity: 0.7,
-    shadowColor: 'rgba(46, 229, 157, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-  },
-  buttonTextStyle: {
-    color: 'red',
-    fontWeight: '700',
-  },
-dropdown: {
-      height: 40,
-      borderColor: 'grey',
-      borderWidth: 0.5,
-      paddingHorizontal: 8,
-      backgroundColor: '#fff',
-      borderRadius:10,
-      marginTop: 10,
-      marginBottom: 15,
-      width:'100%'
-
-    },
-    symptomsText:{
-       fontSize: 18,
-       marginBottom: 15,
-       color:'#152549',
-    },
- modal: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#e3f2f0',
-    padding: 30,
-  },
-  text: {
-    color: '#3f2949',
-    marginTop: 10,
-  },
-  card_container: {
-    flex: 0.5,
-    justifyContent: 'center',
-    padding: 0,
-    
-  },
-    paragraph: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      padding: 20
-    },
-    item: {
-    backgroundColor: '#eee',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-
-  },
-  item_delete:{
-    width:'10%',
-    fontSize: 28,
-  },
-  listitems: {
-    width: "100%",
-    flex:1,
-    marginTop: 5,
-    backgroundColor: "#eee",
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent:'space-between'
-},
-button_two: {
-    width: "100%",
-    alignItems: 'flex-end',
+          </TouchableWithoutFeedback>
+        </View>
+      </Modal>
+    </Container>
+  )
 }
-});
-
 export default AllergyScreen;
+const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
+const buttonTextStyle = {color: '#fff', fontSize: 14};
+const saperator = {backgroundColor: '#fff', padding: 10};
+const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
+const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
+const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
+const spacer = {padding: 10}
+const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
+const optionStyle = { fontSize: 14 }
+const selectStyle = {margin: -16, marginBottom: -8}
+const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
+const bgWhiteStyle = {backgroundColor: '#fff'}
