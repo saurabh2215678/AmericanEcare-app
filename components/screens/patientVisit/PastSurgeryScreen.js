@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, TouchableOpacity, View, Text, Modal, TextInput, Keyboard} from 'react-native';
 import { Container } from "../components";
-import PharmecyItem from "../components/PharmecyItem";
+import PastsurgeryItem from "../components/Pastsurgeryitem";
 // import PastsurgeryItem from "../components/PastsurgeryItem";
 import { TouchableWithoutFeedback } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from "@react-native-picker/picker";
+import { useSelector } from "react-redux";
+import { HitApi } from "../../../utils";
 
 const PastSurgeryScreen = () => {
+  const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [selectedPharmecy, setSelectedPharmecy] = useState(null);
   const [pharmecyList, setPharmecyList] = useState([]);
@@ -48,16 +51,26 @@ const PastSurgeryScreen = () => {
   }
 
   const getPharmecyList = async () => {
+    
     const apiOptions = {
       endpoint: 'front/api/getPastSurgeryHistory',
       data: { patient_id : storeUser.id},
+      
     }
+   
     const ApiResp = await HitApi(apiOptions);
     setPharmecyList(ApiResp);
     console.log(ApiResp);
+    
   }
-  getPharmecyList();
-console.log(pharmecyList)
+  useEffect(() => {
+    getPharmecyList();
+    
+  }, []); 
+  useEffect(() => {
+    console.log(pharmecyList);
+   
+  }, [pharmecyList]);
   return (
     
     <Container>
@@ -69,7 +82,7 @@ console.log(pharmecyList)
       </TouchableOpacity>
       <View>
         <Text>xfffff</Text>
-        {pharmecyList.map((item, index)=><PharmecyItem key={index} data={item}/>)}
+        {pharmecyList.map((item, index)=><PastsurgeryItem key={index} data={item}/>)}
       </View>
     </ScrollView>
     <Modal

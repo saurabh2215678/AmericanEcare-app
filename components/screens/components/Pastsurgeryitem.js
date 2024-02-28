@@ -5,10 +5,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const PastsurgeryItem = ({data}) =>{
     return(
         <Card style={pahrmecyItemStyle}>
-            <Text>Pharmacy Name:{data.pharmacy_name}</Text>
+            <Text>Surgery Name: xxx {data.surgery_name}</Text>
             <View style={wrapperStyle}>
                 <View style={starStyle}>
-                    <Text>Address : {data['pharmacy_address']}</Text>
+                    <Text>Surgery : {data['pharmacy_address']}</Text>
                     <Text>Zip : {data['patient_pharmacy_zip']}</Text>
                 </View>
                 <View>
