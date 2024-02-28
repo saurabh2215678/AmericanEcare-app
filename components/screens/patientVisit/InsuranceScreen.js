@@ -89,7 +89,7 @@ const InsuranceScreen = ()=>{
 }
 
   return(
-    <View style={{flex: 1, alignItems: 'center',}}>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
          
           <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '100%', alignItems: 'center', justifyContent: 'flex-start'}}>
            

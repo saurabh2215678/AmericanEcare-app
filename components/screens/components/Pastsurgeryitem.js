@@ -9,7 +9,7 @@ const PastsurgeryItem = ({data}) =>{
             <View style={wrapperStyle}>
                 <View style={starStyle}>
                     <Text>Surgery : {data['pharmacy_address']}</Text>
-                    <Text>Zip : {data['patient_pharmacy_zip']}</Text>
+                    <Text>Other : {data['other']}</Text>
                 </View>
                 <View>
                     <TouchableOpacity onPress={()=>{}}>
