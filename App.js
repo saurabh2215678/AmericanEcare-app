@@ -29,6 +29,8 @@ import MedicationScreen from "./components/screens/patientVisit/MedicationScreen
 import PastSurgeryScreen from "./components/screens/patientVisit/PastSurgeryScreen";
 import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 import AllergyScreen from "./components/screens/patientVisit/AllergyScreen";
+import DiagnosisScreen from "./components/screens/patientVisit/DiagnosisScreen";
+import MedicalHistoryScreen from "./components/screens/patientVisit/MedicalHistoryScreen";
 const Drawer = createDrawerNavigator();
 
 
@@ -51,6 +53,8 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="MedicationScreen" component={MedicationScreen} />
         <Drawer.Screen name="AllergyScreen" component={AllergyScreen} />
         <Drawer.Screen name="PastSurgeryScreen" component={PastSurgeryScreen} />
+        <Drawer.Screen name="DiagnosisScreen" component={DiagnosisScreen} />
+        <Drawer.Screen name="MedicalHistoryScreen" component={MedicalHistoryScreen} />
         <Drawer.Screen name="Login" component={Login} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999999999}}/>

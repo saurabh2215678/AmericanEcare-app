@@ -65,6 +65,16 @@ export const SideBarData = [
                 navigateTo: 'AllergyScreen'
             },
             {
+                name: 'Diagnosis',
+                icon: 'file-text',
+                navigateTo: 'DiagnosisScreen'
+            },
+            {
+                name: 'Past Medical History',
+                icon: 'medium',
+                navigateTo: 'MedicalHistoryScreen'
+            },
+            {
                 name: 'Past Surgery Histroy',
                 icon: 'leaf',
                 navigateTo: 'PastSurgeryScreen'
