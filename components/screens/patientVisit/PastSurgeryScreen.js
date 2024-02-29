@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, TouchableOpacity, View, Text, Modal, TextInput, Keyboard} from 'react-native';
 import { Container } from "../components";
-import PharmecyItem from "../components/PharmecyItem";
+import PastsurgeryItem from "../components/Pastsurgeryitem";
 // import PastsurgeryItem from "../components/PastsurgeryItem";
 import { TouchableWithoutFeedback } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from "@react-native-picker/picker";
+import { useSelector } from "react-redux";
+import { HitApi } from "../../../utils";
+import Toast from "react-native-toast-message";
 
 const PastSurgeryScreen = () => {
+  
+  const [formData, setFormData] = useState({});
+  const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [selectedPharmecy, setSelectedPharmecy] = useState(null);
   const [pharmecyList, setPharmecyList] = useState([]);
@@ -18,46 +24,96 @@ const PastSurgeryScreen = () => {
   const [Other, setOther] = useState('');
 
   // const [pharmecySelectData, setPharmecySelectData] = useState([defaultSelectOption]);
+  const handleTextChange = (text, fieldName) => {
+    const newFormData = {...formData, [fieldName] : text};
+    setFormData(newFormData);
+  }
 
+  const savePharmacyApi = async () => {
+    const apiOptions = {
+      endpoint: 'front/api/savePastSurgeryHistory',
+      data: { ...FormData },
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    console.log(ApiResp)
 
-  const savePharmacy = async () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Surgery Saved'
+    });
+  }
+  const savePharmacy = async () =>{
     setsubmitted(true);
-    console.log(AddSurgery)
+    if(
+    
+      formData['insurance_name'] && 
+      formData['surgery'] && 
+      formData['other'] 
+    ){
+      savePharmacyApi();
 
-    if(selectedPharmecy && (selectedPharmecy != -1)){
-      const apiOptions = {
-        endpoint: 'front/api/patient_pharmacy_save',
-        data: { patient_id : storeUser.id, pharmacy_id: selectedPharmecy},
-        withStatus: true
-      }
-      const ApiResp = await HitApi(apiOptions);
-      setAddMoal(false);
-      if(ApiResp.status === "success"){
-        getPharmecyList();
-        Toast.show({
-          type: 'success',
-          text1: "Successfully Saved"
-        });
-      }else{
-        Toast.show({
-          type: 'error',
-          text1: "Something went wrong"
-        });
-      }
     }
   }
 
+  
+  // const savePharmacy = async () => {
+  //   setsubmitted(true);
+  //   console.log(AddSurgery)
+  //   console.log(NewSurgery)
+  //   console.log(Other)
+
+  //   if(selectedPharmecy && (selectedPharmecy != -1)){
+  //     const apiOptions = {
+  //       endpoint: 'front/api/savePastSurgeryHistory',
+  //       data: { patient_id : storeUser.id, pharmacy_id: selectedPharmecy},
+  //       withStatus: true
+  //     }
+  //     const ApiResp = await HitApi(apiOptions);
+  //     setAddMoal(false);
+  //     if(ApiResp.status === "success"){
+  //       getPharmecyList();
+  //       Toast.show({
+  //         type: 'success',
+  //         text1: "Successfully Saved"
+  //       });
+  //     }else{
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: "Something went wrong"
+  //       });
+  //     }
+  //   }
+  // }
+
   const getPharmecyList = async () => {
+    
     const apiOptions = {
       endpoint: 'front/api/getPastSurgeryHistory',
       data: { patient_id : storeUser.id},
+      
     }
+   
     const ApiResp = await HitApi(apiOptions);
     setPharmecyList(ApiResp);
-    console.log(ApiResp);
+    // console.log(ApiResp);
+    
   }
-  getPharmecyList();
-console.log(pharmecyList)
+  useEffect(() => {
+    getPharmecyList();
+    
+  }, []); 
+  useEffect(() => {
+    // console.log(pharmecyList);
+   
+  }, [pharmecyList]);
+
+
+  const getInputValue = (inputName) => {
+    const InpVal = formData[inputName] ? formData[inputName] : '';
+    return InpVal;
+   
+}
   return (
     
     <Container>
@@ -69,7 +125,7 @@ console.log(pharmecyList)
       </TouchableOpacity>
       <View>
         <Text>xfffff</Text>
-        {pharmecyList.map((item, index)=><PharmecyItem key={index} data={item}/>)}
+        {pharmecyList.map((item, index)=><PastsurgeryItem key={index} data={item}/>)}
       </View>
     </ScrollView>
     <Modal
@@ -83,14 +139,25 @@ console.log(pharmecyList)
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
               <Text style={headlineStyle}>Add Past Surgery</Text>
-              <TextInput placeholder="Add Surgery" value={AddSurgery} style={InputStyle} onChangeText={(text)=>setAddSurgery(text)}  returnKeyType="done" />
+
+              {/* <TextInput placeholder="Add Surgery" value={AddSurgery} style={InputStyle} onChangeText={(text)=>setAddSurgery(text)}   returnKeyType="done" /> */}
+
+
+              <TextInput placeholder="Add Surgery" value={getInputValue('insurance_name')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'insurance_name')}  returnKeyType="done"   />
+            {(submitted && !formData['insurance_name']) && <Text style={errorStyle}>Add Surgery Name is Required</Text>}
+
+
                 <View style={spacer}></View>
 
-                <TextInput placeholder="Surgery" value={NewSurgery} style={InputStyle} onChangeText={(text)=>setNewSurgery(text)}  returnKeyType="done" />
-                <View style={spacer}></View>
+                <TextInput placeholder="Surgery" value={getInputValue('surgery')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'surgery')}   returnKeyType="done"   />
+            {(submitted && !formData['surgery']) && <Text style={errorStyle}>Surgery Name is Required</Text>}
 
-                <TextInput placeholder="Other" value={Other} style={InputStyle} onChangeText={(text)=>setOther(text)}  returnKeyType="done" />
-                <View style={spacer}></View>
+            <View style={spacer}></View>
+
+            <TextInput placeholder="Other" value={getInputValue('other')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'other')}   returnKeyType="done"   />
+            {(submitted && !formData['other']) && <Text style={errorStyle}>Other is Required</Text>}
+
+              
               
   
            

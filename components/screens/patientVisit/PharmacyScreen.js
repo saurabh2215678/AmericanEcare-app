@@ -60,7 +60,7 @@ const PharmacyScreen = () => {
 
   const savePharmacy = async () => {
     setsubmitted(true);
-    if(selectedPharmecy && (selectedPharmecy != -1)){
+    
       const apiOptions = {
         endpoint: 'front/api/patient_pharmacy_save',
         data: { patient_id : storeUser.id, pharmacy_id: selectedPharmecy},
@@ -80,7 +80,7 @@ const PharmacyScreen = () => {
           text1: "Something went wrong"
         });
       }
-    }
+    
   }
 
   useEffect(()=>{
