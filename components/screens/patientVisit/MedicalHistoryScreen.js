@@ -45,6 +45,7 @@ const MedicalHistoryScreen = () => {
                     <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
  
                   </Picker>
+                  
                 </View>
               </View>
             </TouchableWithoutFeedback>

@@ -1,7 +1,7 @@
 import { ScrollView, Modal, View, Pressable, Text, TouchableWithoutFeedback, Keyboard, TouchableOpacity, TextInput } from "react-native";
 import { Container } from "../components";
 import DiagnosisItem from "../components/DiagnosisItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ModalSelector from "react-native-modal-selector-searchable";
 import { HitApi } from "../../../utils";
@@ -16,6 +16,7 @@ const DiagnosisScreen = () => {
     const [selectedDiagnosis, setSelectedDiagnosis] = useState();
     const [note, setNote] = useState('');
     const [submitted, setsubmitted] = useState(false);
+    const [updating, setUpdating] = useState(false);
 
     const getDiaognsisListByKeyword = async (keyword) => {
         const apiOptions = {
@@ -35,36 +36,120 @@ const DiagnosisScreen = () => {
           }
     }
 
+    const getTwentyDiaognisList = async () => {
+        const apiOptions = {
+            endpoint: 'front/api/getTwentyDiaognisList',
+            data: {}
+        }
+        const ApiResp = await HitApi(apiOptions);
+        if(ApiResp.length > 1){
+            let index = 0;
+            const dpdata = [];
+            ApiResp.forEach(element => {
+              const modifiedItem = {key: index++, label: element['name'], data: element};
+              dpdata.push(modifiedItem);
+            });
+            setDiagnosisDropDownList(dpdata);
+          }
+    }
+
+    const getDiagnosis = async () => {
+        const apiOptions = {
+            endpoint: 'front/api/getDiagnosis',
+            data: {
+                patient_id : storeUser.id
+            }
+        }
+        const ApiResp = await HitApi(apiOptions);
+        setDiagnoseList(ApiResp);
+    }
+
     const handleDiagnoseSearchChange = (val) => {
         getDiaognsisListByKeyword(val);
     }
 
-    const SaveDiagnosis = async () => {
-        console.log('selectedDiagnosis =', selectedDiagnosis);
-        // console.log('save diagnosis');
-        // console.log('patient_id =', storeUser.id);
-        // console.log('diagnosis =', selectedDiagnosis.label);
-        // console.log('notes =', note);
-        // console.log('id =', selectedDiagnosis.data.id);
-        // const apiOptions = {
-        //     endpoint: 'front/api/SaveDiagnosis',
-        //     data: {
-        //         patient_id: storeUser.id,
-        //         diagnosis: selectedDiagnosis.label,
-        //         notes: note,
-        //         id: selectedDiagnosis.data.id
-        //     },
-        //     withStatus: true
-        //   }
-        //   const ApiResp = await HitApi(apiOptions);
-        //   console.log('ApiResp', ApiResp);
+    const createDiagnosis = async () => {
+        const apiOptions = {
+            endpoint: 'front/api/SaveDiagnosis',
+            data: {
+                patient_id: storeUser.id,
+                diagnosis: selectedDiagnosis.label,
+                notes: note
+            },
+            withStatus: true
+          }
+          const ApiResp = await HitApi(apiOptions);
+          setAddMoal(false);
+          getDiagnosis();
     }
 
     const validateAndSaveDiagnosis = () =>{
         setsubmitted(true);
-        if(selectedDiagnosis && note.length > 0){
-            SaveDiagnosis()
+        if(updating){
+            updateDiagnosis();
+            return;
         }
+        if(selectedDiagnosis && note.length > 0){
+            createDiagnosis()
+        }
+    }
+
+    const updateDiagnosis = async () => {
+        const diagnosisName = selectedDiagnosis ? selectedDiagnosis.label : updating.data.diagnosis;
+        const apiOptions = {
+            endpoint: 'front/api/SaveDiagnosis',
+            data: {
+                patient_id: storeUser.id,
+                diagnosis: diagnosisName,
+                notes: note,
+                id: updating.data.id
+            },
+            withStatus: true
+          }
+          const ApiResp = await HitApi(apiOptions);
+          setAddMoal(false);
+          getDiagnosis();
+    }
+
+    useEffect(()=>{
+        getTwentyDiaognisList();
+    },[]);
+
+    useEffect(()=>{
+        if(storeUser.id){
+            getDiagnosis();
+        }
+    },[storeUser]);
+
+    const handleUpdate = (data) => {
+        setAddMoal(true);
+        setNote(data.notes);
+        setUpdating({data});
+    }
+
+
+    useEffect(()=>{
+        if(!addModal){
+            setUpdating(false);
+            setSelectedDiagnosis(null);
+            setsubmitted(false);
+            setNote(null);
+            getTwentyDiaognisList();
+        }
+    },[addModal]);
+
+    const deleteDiagnose = async (id) => {
+        const apiOptions = {
+            endpoint: 'front/api/DeleteDiagnosis',
+            data: {
+                patient_id: storeUser.id,
+                id
+            },
+            withStatus: true
+          }
+          const ApiResp = await HitApi(apiOptions);
+          setAddMoal(false);
+          getDiagnosis();
     }
 
     return(
@@ -76,7 +161,7 @@ const DiagnosisScreen = () => {
                     </View>
                 </TouchableOpacity>
                 <View>
-                    {diagnoseList.map((item, index)=><DiagnosisItem key={index} data={item} />)}
+                    {diagnoseList.map((item, index)=><DiagnosisItem key={index} data={item} handleUpdate={handleUpdate} handleDelete={deleteDiagnose} />)}
                 </View>
             </ScrollView>
             <Modal
@@ -94,7 +179,7 @@ const DiagnosisScreen = () => {
                                 <View style={selectWrapper}>
                                 <ModalSelector
                                     data={diagnosisDropDownList}
-                                    initValue="Select Diagnosis"
+                                    initValue={updating?.data?.diagnosis ? updating.data.diagnosis : "Select Diagnosis"}
                                     supportedOrientations={['landscape']}
                                     accessible={true}
                                     value={selectedDiagnosis}
@@ -107,11 +192,12 @@ const DiagnosisScreen = () => {
                                     sectionStyle = {bgWhiteStyle}
                                     cancelStyle = {bgWhiteStyle}
                                     searchStyle = {bgWhiteStyle}
+                                    initValueTextStyle = {updating ? updatingInitialValueStyle : {}}
                                     onChangeSearch = {handleDiagnoseSearchChange}
                                     >
 
                                 </ModalSelector>
-                                {(submitted && !selectedDiagnosis) && <Text style={errorStyle}>Diagnosis is Required</Text>}
+                                {(submitted && !selectedDiagnosis && !updating) && <Text style={errorStyle}>Diagnosis is Required</Text>}
                                 </View>
                                 <View style={spacer}></View>
                                 <TextInput placeholder="Note" value={note} style={InputStyle} onChangeText={(text)=>setNote(text)}  returnKeyType="done" />
@@ -146,3 +232,4 @@ const optionStyle = { fontSize: 14 }
 const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
 const bgWhiteStyle = {backgroundColor: '#fff'}
+const updatingInitialValueStyle = {color: '#000'}
