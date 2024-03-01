@@ -12,14 +12,14 @@ import { useSelector } from "react-redux";
 const MedicalHistoryScreen = () => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
-  const [medicalHistoryList, setMedicalHistoryList] = useState([]);
-  const [dieasesDropDownList, setDieasesDropDownList] = useState([]);
   const [selectBox, setselectBox] = useState();
   const [updating, setUpdating] = useState(false);
+  const [submitted, setsubmitted] = useState(false);
+  const [medicalHistoryList, setMedicalHistoryList] = useState([]);
+  const [dieasesDropDownList, setDieasesDropDownList] = useState([]);
   const [selectedDieases, setSelectedDieases] = useState();
   const [age, setAge] = useState();
   const [comment, setComment] = useState();
-  const [submitted, setsubmitted] = useState(false);
 
   const getDieasesListByKeyword = async (keyword) => {
     const apiOptions = {

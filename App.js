@@ -31,6 +31,7 @@ import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-d
 import AllergyScreen from "./components/screens/patientVisit/AllergyScreen";
 import DiagnosisScreen from "./components/screens/patientVisit/DiagnosisScreen";
 import MedicalHistoryScreen from "./components/screens/patientVisit/MedicalHistoryScreen";
+import PatientSocialHistory from "./components/screens/patientVisit/PatientSocialHistory";
 const Drawer = createDrawerNavigator();
 
 
@@ -55,6 +56,7 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="PastSurgeryScreen" component={PastSurgeryScreen} />
         <Drawer.Screen name="DiagnosisScreen" component={DiagnosisScreen} />
         <Drawer.Screen name="MedicalHistoryScreen" component={MedicalHistoryScreen} />
+        <Drawer.Screen name="PatientSocialHistory" component={PatientSocialHistory} />
         <Drawer.Screen name="Login" component={Login} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999999999}}/>

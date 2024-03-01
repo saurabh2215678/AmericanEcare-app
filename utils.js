@@ -78,6 +78,11 @@ export const SideBarData = [
                 name: 'Past Surgery Histroy',
                 icon: 'leaf',
                 navigateTo: 'PastSurgeryScreen'
+            },
+            {
+                name: 'Patient Social Histroy',
+                icon: 'forumbee',
+                navigateTo: 'PatientSocialHistory'
             }
         ]
     }

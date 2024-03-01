@@ -1,200 +1,155 @@
-import { useEffect, useState } from "react";
-import { Pressable, ScrollView, TouchableOpacity, View, Text, Modal, TextInput, Keyboard} from 'react-native';
+import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput } from "react-native";
 import { Container } from "../components";
-import PastsurgeryItem from "../components/Pastsurgeryitem";
-// import PastsurgeryItem from "../components/PastsurgeryItem";
-import { TouchableWithoutFeedback } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { useSelector } from "react-redux";
 import { HitApi } from "../../../utils";
-import Toast from "react-native-toast-message";
+import { useSelector } from "react-redux";
+import PastsurgeryItem from "../components/Pastsurgeryitem";
 
 const PastSurgeryScreen = () => {
-  
-  const [formData, setFormData] = useState({});
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
-  const [selectedPharmecy, setSelectedPharmecy] = useState(null);
-  const [pharmecyList, setPharmecyList] = useState([]);
-
+  const [updating, setUpdating] = useState(false);
   const [submitted, setsubmitted] = useState(false);
-  const [AddSurgery, setAddSurgery] = useState('');
-  const [NewSurgery, setNewSurgery] = useState('');
-  const [Other, setOther] = useState('');
+  const [selectBox, setselectBox] = useState();
+  const [pastSurgeryList, setPastSurgeryList] = useState([]);
+  const [surgeryDate, setSurgeryDate] = useState();
+  const [surgery, setSurgery] = useState();
+  const [other, setOther] = useState();
 
-  // const [pharmecySelectData, setPharmecySelectData] = useState([defaultSelectOption]);
-  const handleTextChange = (text, fieldName) => {
-    const newFormData = {...formData, [fieldName] : text};
-    setFormData(newFormData);
+  const handleDelete = () => {
+    console.log('deleting');
   }
 
-  const savePharmacyApi = async () => {
+  const getPastSurgeryHistory = async () => {
     const apiOptions = {
-      endpoint: 'front/api/savePastSurgeryHistory',
-      data: { ...FormData },
-      withStatus: true
+        endpoint: 'front/api/getPastSurgeryHistory',
+        data: {
+          patient_id: storeUser.id
+        }
     }
     const ApiResp = await HitApi(apiOptions);
-    console.log(ApiResp)
-
-    Toast.show({
-      type: 'success',
-      text1: 'Surgery Saved'
-    });
+    setPastSurgeryList(ApiResp);
   }
-  const savePharmacy = async () =>{
+  const savePastSurgeryHistory = async () => {
+    const apiOptions = {
+        endpoint: 'front/api/savePastSurgeryHistory',
+        data: {
+          patient_id: storeUser.id,
+          surgery_confirm : selectBox,
+          surgery_date : surgeryDate,
+          other : other
+        }
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setAddMoal(false);
+    getPastSurgeryHistory();
+  }
+
+  const handleUpdate = async (data) =>{
+    setAddMoal(true);
+    setselectBox(data.surgery_confirm);
+    setSurgeryDate(data.surgery_date);
+    setSurgery(data.surgery_name);
+    setOther(data.other);
+    setUpdating({data});
+  }
+
+  const updatePastSurgeryHistory = async () => {
+    console.log('updating..')
+  }
+
+  const validateAndSaveSurgery = () => {
     setsubmitted(true);
-    if(
-    
-      formData['insurance_name'] && 
-      formData['surgery'] && 
-      formData['other'] 
-    ){
-      savePharmacyApi();
-
+    if(updating && selectBox &&  surgeryDate && surgery && other){
+        updatePastSurgeryHistory();
+        return;
+    }
+    if(selectBox && surgeryDate && surgery && other){
+      savePastSurgeryHistory()
     }
   }
 
-  
-  // const savePharmacy = async () => {
-  //   setsubmitted(true);
-  //   console.log(AddSurgery)
-  //   console.log(NewSurgery)
-  //   console.log(Other)
+  useEffect(()=>{
+      if(storeUser.id){
+        getPastSurgeryHistory();
+      }
+  },[storeUser]);
 
-  //   if(selectedPharmecy && (selectedPharmecy != -1)){
-  //     const apiOptions = {
-  //       endpoint: 'front/api/savePastSurgeryHistory',
-  //       data: { patient_id : storeUser.id, pharmacy_id: selectedPharmecy},
-  //       withStatus: true
-  //     }
-  //     const ApiResp = await HitApi(apiOptions);
-  //     setAddMoal(false);
-  //     if(ApiResp.status === "success"){
-  //       getPharmecyList();
-  //       Toast.show({
-  //         type: 'success',
-  //         text1: "Successfully Saved"
-  //       });
-  //     }else{
-  //       Toast.show({
-  //         type: 'error',
-  //         text1: "Something went wrong"
-  //       });
-  //     }
-  //   }
-  // }
+  useEffect(()=>{
+      if(!addModal){
+          setUpdating(false);
+          setsubmitted(false);
 
-  const getPharmecyList = async () => {
-    
-    const apiOptions = {
-      endpoint: 'front/api/getPastSurgeryHistory',
-      data: { patient_id : storeUser.id},
-      
-    }
-   
-    const ApiResp = await HitApi(apiOptions);
-    setPharmecyList(ApiResp);
-    // console.log(ApiResp);
-    
-  }
-  useEffect(() => {
-    getPharmecyList();
-    
-  }, []); 
-  useEffect(() => {
-    // console.log(pharmecyList);
-   
-  }, [pharmecyList]);
+          setselectBox("Yes");
+          setSurgeryDate(null);
+          setSurgery(null);
+          setOther(null);
+      }
+  },[addModal]);
 
-
-  const getInputValue = (inputName) => {
-    const InpVal = formData[inputName] ? formData[inputName] : '';
-    return InpVal;
-   
-}
-  return (
-    
-    <Container>
-    <ScrollView style={fullDependent}>
-      <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>setAddMoal(true)}>
-          <View style={{backgroundColor: '#33BAD8', paddingHorizontal:7, paddingVertical: 6, margin: 8, borderRadius: 3 }}>
-            <Icon name="plus" size={12} color="#ffffff" />
+  return(
+  <Container>
+      <ScrollView style={fullDependent}>
+        <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>setAddMoal(true)}>
+              <View style={{backgroundColor: '#33BAD8', paddingHorizontal:7, paddingVertical: 6, margin: 8, borderRadius: 3 }}>
+                <Icon name="plus" size={12} color="#ffffff" />
+              </View>
+          </TouchableOpacity>
+          <View>
+            {pastSurgeryList.map((item, index)=><PastsurgeryItem key={index} data={item}  handleDelete={handleDelete} handleUpdate={handleUpdate} />)}
           </View>
-      </TouchableOpacity>
-      <View>
-        <Text>xfffff</Text>
-        {pharmecyList.map((item, index)=><PastsurgeryItem key={index} data={item}/>)}
-      </View>
-    </ScrollView>
-    <Modal
-      visible={addModal}
-      animationType="fade"
-      onRequestClose={()=>setAddMoal(false)}
-      useNativeDriver={true}
-      transparent>
+      </ScrollView>
+      <Modal
+        visible={addModal}
+        animationType="fade"
+        onRequestClose={()=>setAddMoal(false)}
+        useNativeDriver={true}
+        transparent>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setAddMoal(false)}/>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={headlineStyle}>Add Past Surgery</Text>
-
-              {/* <TextInput placeholder="Add Surgery" value={AddSurgery} style={InputStyle} onChangeText={(text)=>setAddSurgery(text)}   returnKeyType="done" /> */}
-
-
-              <TextInput placeholder="Add Surgery" value={getInputValue('insurance_name')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'insurance_name')}  returnKeyType="done"   />
-            {(submitted && !formData['insurance_name']) && <Text style={errorStyle}>Add Surgery Name is Required</Text>}
-
-
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={headlineStyle}>Add Past Surgery</Text>
                 <View style={spacer}></View>
-
-                <TextInput placeholder="Surgery" value={getInputValue('surgery')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'surgery')}   returnKeyType="done"   />
-            {(submitted && !formData['surgery']) && <Text style={errorStyle}>Surgery Name is Required</Text>}
-
-            <View style={spacer}></View>
-
-            <TextInput placeholder="Other" value={getInputValue('other')} style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'other')}   returnKeyType="done"   />
-            {(submitted && !formData['other']) && <Text style={errorStyle}>Other is Required</Text>}
-
-              
-              
-  
-           
-              {/* {(submitted && (!selectedPharmecy || (selectedPharmecy === -1))) && <Text style={errorStyle}>Pharmacy is Required</Text>} */}
-  
-              <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
-                <TouchableOpacity style={buttonStyle} onPress={savePharmacy}>
-                  <Text style={buttonTextStyle}>Save</Text>
-                </TouchableOpacity>
-                <View style={saperator}></View>
-                <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
-                  <Text style={buttonTextStyle}>Cancel</Text>
-                </TouchableOpacity>
-              
+                <View style={selectWrapper}>
+                  <Picker
+                    selectedValue={selectBox}
+                    onValueChange={(itemValue, itemIndex) => setselectBox(itemValue)}
+                    style={selectStyle}
+                  >
+                    <Picker.Item label="Yes" value="Yes" style={optionStyle} />
+                    <Picker.Item label="No" value="No" style={optionStyle} /> 
+                  </Picker>
+                  <View style={spacer}></View>
+                  <TextInput placeholder="Date Of Surgery" value={surgeryDate} style={InputStyle} onChangeText={(text)=>setSurgeryDate(text)}  returnKeyType="next" onSubmitEditing={() => focusNextInput(surgeryInputRef)} />
+                  {(submitted && !surgeryDate) && <Text style={errorStyle}>Date is Required</Text>}
+                  <View style={spacer}></View>
+                  <TextInput placeholder="Surgery" value={surgery} style={InputStyle} onChangeText={(text)=>setSurgery(text)}  returnKeyType="next" ref={(input) => (surgeryInputRef = input)} onSubmitEditing={() => focusNextInput(otherInputRef)} />
+                  {(submitted && !surgery) && <Text style={errorStyle}>Surgery is Required</Text>}
+                  <View style={spacer}></View>
+                  <TextInput placeholder="Other" value={other} style={InputStyle} onChangeText={(text)=>setOther(text)}  returnKeyType="done" ref={(input) => (otherInputRef = input)} />
+                  {(submitted && !other) && <Text style={errorStyle}>Other is Required</Text>}
+                </View>
+                <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                    <TouchableOpacity style={buttonStyle} onPress={validateAndSaveSurgery}>
+                        <Text style={buttonTextStyle}>Save</Text>
+                    </TouchableOpacity>
+                    <View style={saperator}></View>
+                    <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
+                        <Text style={buttonTextStyle}>Cancel</Text>
+                    </TouchableOpacity>
+                </View>
               </View>
-            </View>
-        </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
           </View>
-  
-    </Modal>
+        </Modal>
   </Container>
-    // <View style={styles.container}>
-    //   <Text>Hello World Test</Text>
-    // </View>
   );
- 
-};
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-// });
-
+}
 export default PastSurgeryScreen;
+
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const saperator = {backgroundColor: '#fff', padding: 10};
@@ -205,10 +160,4 @@ const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 const optionStyle = { fontSize: 14 }
 const selectStyle = {margin: -16, marginBottom: -8}
-const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative', borderBottomWidth:1, borderColor: '#ababab', }
-
-
-
-
-
-
+const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
