@@ -85,7 +85,7 @@ const DiagnosisScreen = () => {
 
     const validateAndSaveDiagnosis = () =>{
         setsubmitted(true);
-        if(updating){
+        if(updating && note.length > 0){
             updateDiagnosis();
             return;
         }

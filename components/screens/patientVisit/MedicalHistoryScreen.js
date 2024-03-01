@@ -1,15 +1,160 @@
-import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text } from "react-native";
+import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput } from "react-native";
 import { Container } from "../components";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MedicalHistoryItem from "../components/MedicalHistoryItem";
 import { Picker } from "@react-native-picker/picker";
+import ModalSelector from "react-native-modal-selector-searchable";
+import { HitApi } from "../../../utils";
+import { useSelector } from "react-redux";
 
 
 const MedicalHistoryScreen = () => {
+  const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [medicalHistoryList, setMedicalHistoryList] = useState([]);
+  const [dieasesDropDownList, setDieasesDropDownList] = useState([]);
   const [selectBox, setselectBox] = useState();
+  const [updating, setUpdating] = useState(false);
+  const [selectedDieases, setSelectedDieases] = useState();
+  const [age, setAge] = useState();
+  const [comment, setComment] = useState();
+  const [submitted, setsubmitted] = useState(false);
+
+  const getDieasesListByKeyword = async (keyword) => {
+    const apiOptions = {
+        endpoint: 'front/api/search_dieases_with_keywords',
+        data: { searchTerm :  keyword},
+        withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    if(ApiResp.length > 1){
+        let index = 0;
+        const dpdata = [];
+        ApiResp.forEach(element => {
+          const modifiedItem = {key: index++, label: element['text'], data: element};
+          dpdata.push(modifiedItem);
+        });
+        setDieasesDropDownList(dpdata);
+      }
+  }
+
+  const getTwentyDieasesList = async () => {
+    const apiOptions = {
+        endpoint: 'front/api/getTwentydieasesList',
+        data: {},
+        withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    if(ApiResp.length > 1){
+        let index = 0;
+        const dpdata = [];
+        ApiResp.forEach(element => {
+          const modifiedItem = {key: index++, label: element['text'], data: element};
+          dpdata.push(modifiedItem);
+        });
+        setDieasesDropDownList(dpdata);
+      }
+  }
+
+  const getPastMedicalHistory = async () => {
+    const apiOptions = {
+        endpoint: 'front/api/get_patient_past_medical_history',
+        data: {
+          patient_id: storeUser.id
+        }
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setMedicalHistoryList(ApiResp);
+  }
+
+  const handleDieasesSearchChange = (val) => {
+    getDieasesListByKeyword(val);
+  }
+
+  const updatePastMedicalHistory = async () => {
+    const diagnosisName = selectedDieases ? selectedDieases.label : updating.data.illness;
+    const apiOptions = {
+        endpoint: 'front/api/save_patient_past_medical_history',
+        data: {
+          patient_id: storeUser.id,
+          illness : diagnosisName,
+          onset_age : age,
+          comment : comment,
+          id : updating.data.id
+        }
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setAddMoal(false);
+    getPastMedicalHistory();
+  }
+
+  const savePastMedicalHistory = async () => {
+    const apiOptions = {
+        endpoint: 'front/api/save_patient_past_medical_history',
+        data: {
+          patient_id: storeUser.id,
+          illness : selectedDieases.label,
+          onset_age : age,
+          comment : comment
+        }
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setAddMoal(false);
+    getPastMedicalHistory();
+    }
+
+
+  const validateAndSaveDiagnosis = () =>{
+      setsubmitted(true);
+      if(updating && (age?.length > 0) && (comment?.length > 0)){
+          updatePastMedicalHistory();
+          return;
+      }
+      if(selectedDieases && (age?.length > 0) && (comment?.length > 0)){
+        savePastMedicalHistory()
+      }
+  }
+
+  const handleUpdate = (data) => {
+      setAddMoal(true);
+      setAge(data.onset_age);
+      setComment(data.comment);
+      setUpdating({data});
+  }
+
+  const handleDelete = async (id) => {
+    const apiOptions = {
+      endpoint: 'front/api/delete_patient_past_medical_history',
+      data: {id},
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setAddMoal(false);
+    getPastMedicalHistory();
+  }
+
+  useEffect(()=>{
+      if(storeUser.id){
+          getPastMedicalHistory();
+      }
+  },[storeUser]);
+
+  useEffect(()=>{
+    getTwentyDieasesList();
+  },[]);
+
+  useEffect(()=>{
+      if(!addModal){
+          setUpdating(false);
+          setSelectedDieases(null);
+          setsubmitted(false);
+          setAge(null);
+          setComment(null);
+          getTwentyDieasesList();
+      }
+  },[addModal]);
+
   return(
     <Container>
       <ScrollView style={fullDependent}>
@@ -19,7 +164,7 @@ const MedicalHistoryScreen = () => {
               </View>
           </TouchableOpacity>
           <View>
-            {medicalHistoryList.map((item, index)=><MedicalHistoryItem key={index} data={item} />)}
+            {medicalHistoryList.map((item, index)=><MedicalHistoryItem key={index} data={item} handleUpdate={handleUpdate} handleDelete={handleDelete} />)}
           </View>
       </ScrollView>
       <Modal
@@ -45,7 +190,39 @@ const MedicalHistoryScreen = () => {
                     <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
  
                   </Picker>
-                  
+                  <ModalSelector
+                        data={dieasesDropDownList}
+                        initValue={updating?.data?.illness ? updating.data.illness : "Select Dieases"}
+                        supportedOrientations={['landscape']}
+                        accessible={true}
+                        value={selectedDieases}
+                        placeHolderTextColor="red"
+                        scrollViewAccessibilityLabel={'Scrollable options'}
+                        cancelButtonAccessibilityLabel={'Cancel Button'}
+                        onChange={(val)=>setSelectedDieases(val)}
+                        optionContainerStyle = {bgWhiteStyle}
+                        optionStyle = {bgWhiteStyle}
+                        sectionStyle = {bgWhiteStyle}
+                        cancelStyle = {bgWhiteStyle}
+                        searchStyle = {bgWhiteStyle}
+                        initValueTextStyle = {updating ? updatingInitialValueStyle : {}}
+                        onChangeSearch = {handleDieasesSearchChange}
+                        >
+                    </ModalSelector>
+                    {(submitted && !selectedDieases && !updating) && <Text style={errorStyle}>Dieases is Required</Text>}
+                    <TextInput placeholder="Onset Age" value={age} style={InputStyle} onChangeText={(text)=>setAge(text)}  returnKeyType="next" onSubmitEditing={() => focusNextInput(commentInputRef)} />
+                    {(submitted && !age) && <Text style={errorStyle}>Onset Age is Required</Text>}
+                    <TextInput placeholder="Comment" value={comment} style={InputStyle} onChangeText={(text)=>setComment(text)}  returnKeyType="done" ref={(input) => (commentInputRef = input)} />
+                    {(submitted && !comment) && <Text style={errorStyle}>Comment is Required</Text>}
+                </View>
+                <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                    <TouchableOpacity style={buttonStyle} onPress={validateAndSaveDiagnosis}>
+                        <Text style={buttonTextStyle}>Save</Text>
+                    </TouchableOpacity>
+                    <View style={saperator}></View>
+                    <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
+                        <Text style={buttonTextStyle}>Cancel</Text>
+                    </TouchableOpacity>
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -67,3 +244,4 @@ const optionStyle = { fontSize: 14 }
 const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
 const bgWhiteStyle = {backgroundColor: '#fff'}
+const updatingInitialValueStyle = {color: '#000'}
