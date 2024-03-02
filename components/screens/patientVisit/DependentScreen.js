@@ -9,6 +9,7 @@ import Toast from 'react-native-toast-message';
 import { HitApi } from "../../../utils";
 import DependentItem from "../components/DependentItem";
 import { ScrollView } from "react-native-gesture-handler";
+import moment from "moment";
 
 
 const DependentScreen = () =>{
@@ -19,6 +20,7 @@ const DependentScreen = () =>{
   const [genderDropDownOpened, setGenderDropDownOpened] = useState(false);
   const [DependentList, setDependentList] = useState([]);
   const [selectedAgeDependent, setSelectedAgeDependent] = useState(-1);
+  const [selectedDate, setSelectedDate] = useState(); 
 
 
   const genders = [
@@ -27,13 +29,13 @@ const DependentScreen = () =>{
   ];
 
   const addDependentApi = async () => {
+
     const apiOptions = {
       endpoint: 'front/api/save_dependent',
       data: { ...formData },
       withStatus: true
     }
     const ApiResp = await HitApi(apiOptions);
-    // console.log(ApiResp)
     setAddMoal(false);
     getDependentApi(formData.patient_id);
     Toast.show({
@@ -82,9 +84,10 @@ const DependentScreen = () =>{
 
   const onDateChange = ({type}, selectedDate) => {
     if(type == 'set'){
-      const currentDate = selectedDate;
-      const newFormData = {...formData, ['dependent_dob'] : currentDate};
-      setFormData(newFormData);
+      setSelectedDate(selectedDate)
+      // const currentDate = selectedDate;
+      // const newFormData = {...formData, ['dependent_dob'] : currentDate};
+      // setFormData(newFormData);
       if(Platform.OS === 'android'){
         toggleDatePicker();
       }
@@ -92,6 +95,11 @@ const DependentScreen = () =>{
       toggleDatePicker();
     }
   }
+
+  useEffect(()=>{
+    var formattedDateString = moment(selectedDate).format("MM/DD/YYYY");
+    setFormData({...formData, dependent_dob : formattedDateString});
+  },[selectedDate])
 
   const getPatientId = async () =>{
     const value = await AsyncStorage.getItem('user_id');
@@ -105,13 +113,12 @@ const DependentScreen = () =>{
   useEffect(()=>{
     if(!addModal){
       setShowDatePicker(false);
+      setsubmitted(false);
+      setFormData({patient_id : formData.patient_id});
+      setSelectedDate(null);
     }
   },[addModal]);
 
-  const getDOBValue = () =>{
-    const dobNewValue = formData['dependent_dob'] ? formData['dependent_dob'].toDateString() : '';
-    return dobNewValue;
-  }
 
   return (
     <Container>
@@ -123,6 +130,7 @@ const DependentScreen = () =>{
           </TouchableOpacity>
           <View>
             {DependentList.map((item, index)=><DependentItem key={index} data={item} selected={selectedAgeDependent === item.id} setSelected={setSelectedAgeDependent} getDependentApi={getDependentApi}/>)}
+            {/* {DependentList.map((item, index)=><Text key={index}>hello</Text>)} */}
           </View>
         </ScrollView>
         <Modal
@@ -147,11 +155,12 @@ const DependentScreen = () =>{
             <View style={spacer}></View>
             {showDatePicker && <DateTimePicker
               mode="date"
-              display="spinner"
-              value={formData['dependent_dob'] || new Date() }
+              display="default"
+              maximumDate = {new Date()}
+              value={selectedDate || new Date() }
               onChange={onDateChange}
             />}
-            <TextInput placeholder="DOB" style={InputStyle} value={getDOBValue()} onFocus={()=>setShowDatePicker(true)} ref={(input) => (dobInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(relationshipInputRef)} />
+            <TextInput placeholder="DOB" style={InputStyle} value={selectedDate ? selectedDate.toDateString() : ''} onFocus={()=>setShowDatePicker(true)} ref={(input) => (dobInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(relationshipInputRef)} />
             {(submitted && !formData['dependent_dob']) && <Text style={errorStyle}>DOB is Required</Text>}
             <View style={spacer}></View>
             <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} ref={(input) => (relationshipInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(phoneInputRef)}/>

@@ -1,22 +1,26 @@
 import { Text, View,TouchableOpacity, Modal, Pressable, TextInput, Platform } from "react-native";
 import { HitApi, calculateAge } from "../../../utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card } from "react-native-paper";
+import moment from "moment";
+import Toast from "react-native-toast-message";
 
 const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
-
+    const relationshipInputRef = useRef(null);
+    var timestamp = moment(data.dependent_dob, "MM/DD/YYYY").toDate();
     const [updateModal, setUpdateMoal] = useState(false);
     const [formData, setFormData] = useState({...data});
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [genderDropDownOpened, setGenderDropDownOpened] = useState(false);
     const [submitted, setsubmitted] = useState(false);
+    const [deleting, setDeleting] = useState(false); 
+    const [selectedDate, setSelectedDate] = useState(new Date(timestamp)); 
 
     const updateDependentApi = async () => {
-        console.log('updating started now');
         const apiOptions = {
           endpoint: 'front/api/save_dependent',
           data: { ...formData, id: data.id },
@@ -30,6 +34,12 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
           text1: ApiResp.msg
         });
       }
+
+      useEffect(()=>{
+        var formattedDateString = moment(selectedDate).format("MM/DD/YYYY");
+        setFormData({...formData, dependent_dob : formattedDateString});
+      },[selectedDate])
+
 
     const UpdatePatientDependent = async () =>{
         setsubmitted(true);
@@ -51,6 +61,18 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
     const focusNextInput = (nextInputRef) => {
         nextInputRef.focus();
       };
+
+    const deleteDependent = async () =>{
+      setDeleting({id: data.id});
+      const apiOptions = {
+        endpoint: 'front/api/delete_dependent',
+        data: { dependent_id:  data.id},
+        withStatus: true
+      }
+      const ApiResp = await HitApi(apiOptions);
+      setDeleting(null);
+      getDependentApi(formData.patient_id);
+    }
 
     const genders = [
         {label: 'Male', value:'male'},
@@ -74,9 +96,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
 
     const onDateChange = ({type}, selectedDate) => {
         if(type == 'set'){
-          const currentDate = selectedDate;
-          const newFormData = {...formData, ['dependent_dob'] : currentDate};
-          setFormData(newFormData);
+          setSelectedDate(selectedDate)
           if(Platform.OS === 'android'){
             toggleDatePicker();
           }
@@ -94,15 +114,11 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
      getPatientId();
     },[]);
 
-    const getDOBValue = () =>{
-        let dobNewValue = new Date().toDateString();
-        try{
-            dobNewValue = new Date(formData['dependent_dob']).toDateString();
-        }catch (err){
-            dobNewValue = new Date().toDateString();
-        }
-        return dobNewValue;
-      }
+    useEffect(()=>{
+     if(!showDatePicker && relationshipInputRef.current){
+      relationshipInputRef.current.focus();
+     }
+    },[showDatePicker]);
     
     const getInputValue = (inputName) => {
         const InpVal = formData[inputName] ? formData[inputName] : '';
@@ -127,7 +143,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
                     <TouchableOpacity onPress={()=>setUpdateMoal(true)}>
                         <Icon name="pencil" size={18} color="#030303" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={{marginLeft: 12}} onPress={()=>{}}>
+                    <TouchableOpacity style={{marginLeft: 12}} onPress={deleteDependent}>
                         <Icon name="trash" size={18} color="red" />
                     </TouchableOpacity>
                 </View>
@@ -150,19 +166,23 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
             <TextInput placeholder="Middle Name" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_middle_name')} value={getInputValue('dependent_middle_name')} ref={(input) => (middleNameInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(lastNameInputRef)} />
             {(submitted && !formData['dependent_middle_name']) && <Text style={errorStyle}>Middle Name is Required</Text>}
             <View style={spacer}></View>
-            <TextInput placeholder="Last Name" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_last_name')} value={getInputValue('dependent_last_name')} ref={(input) => (lastNameInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(dobInputRef)} />
+            <TextInput placeholder="Last Name" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_last_name')} value={getInputValue('dependent_last_name')} ref={(input) => (lastNameInputRef = input)} returnKeyType="next" onSubmitEditing={() => setShowDatePicker(true)} />
             {(submitted && !formData['dependent_last_name']) && <Text style={errorStyle}>Last Name is Required</Text>}
             <View style={spacer}></View>
             {showDatePicker && <DateTimePicker
               mode="date"
-              display="spinner"
-              value={new Date(formData['dependent_dob'])}
+              display="default"
+              maximumDate = {new Date()}
+              value={selectedDate}
               onChange={onDateChange}
             />}
-            <TextInput placeholder="DOB" style={InputStyle} value={getDOBValue()} onFocus={()=>setShowDatePicker(true)} ref={(input) => (dobInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(relationshipInputRef)} />
+            <TouchableOpacity style={dateBtnStyle} onPress={()=>setShowDatePicker(true)}>
+              <Text>{selectedDate.toDateString()}</Text>
+            </TouchableOpacity>
+            {/* <TextInput placeholder="DOB" style={InputStyle} value={} onFocus={()=>setShowDatePicker(true)} ref={(input) => (dobInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(relationshipInputRef)} /> */}
             {(submitted && !formData['dependent_dob']) && <Text style={errorStyle}>DOB is Required</Text>}
             <View style={spacer}></View>
-            <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} value={getInputValue('dependent_relationship')} ref={(input) => (relationshipInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(phoneInputRef)}/>
+            <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} value={getInputValue('dependent_relationship')} ref={relationshipInputRef} returnKeyType="next" onSubmitEditing={() => focusNextInput(phoneInputRef)}/>
             {(submitted && !formData['dependent_relationship']) && <Text style={errorStyle}>Relationship is Required</Text>}
             <View style={spacer}></View>
             <TextInput placeholder="Phone Number" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'patient_phone')} value={getInputValue('patient_phone')} ref={(input) => (phoneInputRef = input)} returnKeyType="done"/>
@@ -241,3 +261,4 @@ const dependentItemStyle = {paddingHorizontal: 16, paddingVertical: 8, paddingBo
 const viewSidebySide = {flexDirection: 'row'}
 const bottomStyle = {flexDirection: 'row', justifyContent: 'space-between'}
 const halfWidth = {width:'42%'}
+const dateBtnStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab', paddingBottom: 6}

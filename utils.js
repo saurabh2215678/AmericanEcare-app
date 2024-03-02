@@ -116,12 +116,37 @@ export const HitApi = async ({endpoint, data, withStatus = false}) => {
     }
 }
 
-export const calculateAge = ({AgeString}) => {
+export const calculateAge = ({ AgeString }) => {
     const now = moment();
-    const birthDate = moment(AgeString);
+    const birthDate = moment(AgeString, 'MM/DD/YYYY');
+    
     const years = now.diff(birthDate, 'years');
     const months = now.diff(birthDate, 'months') % 12;
-    // const age = `${years} year(s), ${months} month(s)`;
-    const age = `${years} year`;
+    const days = now.diff(birthDate, 'days');
+    const hours = now.diff(birthDate, 'hours');
+    const minutes = now.diff(birthDate, 'minutes');
+    const seconds = now.diff(birthDate, 'seconds');
+
+    let age = '';
+
+    if (years > 0) {
+        age = `${years} year`;
+    } else if (months > 0) {
+        age = `${months} month`;
+    } else if (days > 0) {
+        age = `${days} day`;
+    } else if (hours > 0) {
+        age = `${hours} hour`;
+    } else if (minutes > 0) {
+        age = `${minutes} minute`;
+    } else {
+        age = `${seconds} second`;
+    }
+
+    // Add plural form if the value is greater than 1
+    if (age !== '1 second') {
+        age += 's';
+    }
+
     return age;
-}
+};
