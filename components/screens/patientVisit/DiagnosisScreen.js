@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import ModalSelector from "react-native-modal-selector-searchable";
 import { HitApi } from "../../../utils";
 import { useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
 
 
 const DiagnosisScreen = () => {
@@ -17,6 +18,7 @@ const DiagnosisScreen = () => {
     const [note, setNote] = useState('');
     const [submitted, setsubmitted] = useState(false);
     const [updating, setUpdating] = useState(false);
+    const [dataLoading, setDataLoading] = useState(false);
 
     const getDiaognsisListByKeyword = async (keyword) => {
         const apiOptions = {
@@ -54,6 +56,7 @@ const DiagnosisScreen = () => {
     }
 
     const getDiagnosis = async () => {
+        setDataLoading(true);
         const apiOptions = {
             endpoint: 'front/api/getDiagnosis',
             data: {
@@ -61,6 +64,7 @@ const DiagnosisScreen = () => {
             }
         }
         const ApiResp = await HitApi(apiOptions);
+        setDataLoading(false);
         setDiagnoseList(ApiResp);
     }
 
@@ -107,6 +111,10 @@ const DiagnosisScreen = () => {
             withStatus: true
           }
           const ApiResp = await HitApi(apiOptions);
+          Toast.show({
+            type: 'success',
+            text1: "successfully update"
+          })
           setAddMoal(false);
           getDiagnosis();
     }
@@ -148,6 +156,10 @@ const DiagnosisScreen = () => {
             withStatus: true
           }
           const ApiResp = await HitApi(apiOptions);
+          Toast.show({
+            label: "success",
+            text1: 'Successfully deleted'
+          })
           setAddMoal(false);
           getDiagnosis();
     }
@@ -161,6 +173,7 @@ const DiagnosisScreen = () => {
                     </View>
                 </TouchableOpacity>
                 <View>
+                    {dataLoading && <Text style={loadingtext}>Loading...</Text>}
                     {diagnoseList.map((item, index)=><DiagnosisItem key={index} data={item} handleUpdate={handleUpdate} handleDelete={deleteDiagnose} />)}
                 </View>
             </ScrollView>
@@ -229,6 +242,7 @@ const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize:
 const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 const optionStyle = { fontSize: 14 }
+const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' }
 const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
 const bgWhiteStyle = {backgroundColor: '#fff'}

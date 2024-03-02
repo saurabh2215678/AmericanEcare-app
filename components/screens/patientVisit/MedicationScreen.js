@@ -24,6 +24,7 @@ const MedicationScreen = () => {
   const [selectedStrength, setSelectedStrength] = useState();
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [submitted, setsubmitted] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
 
   const populateDrugsDropDown = async () => {
     setMedicationDropdownListState('loading')
@@ -74,16 +75,22 @@ const MedicationScreen = () => {
       withStatus: true
     }
     const ApiResp = await HitApi(apiOptions);
+    Toast.show({
+      label: "success",
+      text1: 'Successfully deleted'
+    })
     getMedicationList(storeUser.id);
   }
 
   const getMedicationList = async (userId) => {
+    setDataLoading(true);
     const apiOptions = {
       endpoint: 'front/api/getMedication',
       data: {patient_id : userId },
       withStatus: true
     }
     const ApiResp = await HitApi(apiOptions);
+    setDataLoading(false);
     if(ApiResp?.status === 'success'){
       Toast.show({
         type: 'success',
@@ -178,6 +185,8 @@ const MedicationScreen = () => {
         </TouchableOpacity>
 
         <View>
+        
+          {dataLoading && <Text style={loadingtext}>Loading...</Text>}
           {medicationList.map((item, index)=><MedicationItem key={index} data={item} deleteMedication={deleteMedication}/>)}
         </View>
       </ScrollView>
@@ -281,8 +290,9 @@ export default MedicationScreen;
 
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
+const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' }
 const saperator = {backgroundColor: '#fff', padding: 10};
-const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
+const InputStyle = {width: '100%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
 const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { Text, View, TextInput } from "react-native"
 import { HitApi } from "../../../utils";
+import Toast from "react-native-toast-message";
 
 const InsuranceScreen = ()=>{
 
@@ -89,7 +90,7 @@ const InsuranceScreen = ()=>{
 }
 
   return(
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    <View style={{flex: 1, paddingHorizontal:7, paddingVertical: 6, margin: 8 }}>
          
           <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '100%', alignItems: 'center', justifyContent: 'flex-start'}}>
            
