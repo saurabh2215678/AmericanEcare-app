@@ -23,6 +23,7 @@ const PharmacyScreen = () => {
   const [selectedPharmecy, setSelectedPharmecy] = useState(null);
   const [zipCode, setZipCode] = useState('');
   const [submitted, setsubmitted] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
 
 
   const getPharmecyDropdownList = async () => {
@@ -48,11 +49,13 @@ const PharmacyScreen = () => {
   },[zipCode]);
 
   const getPharmecyList = async () => {
+    setDataLoading(true)
     const apiOptions = {
       endpoint: 'front/api/patient_pharmacy',
       data: { patient_id : storeUser.id},
     }
     const ApiResp = await HitApi(apiOptions);
+    setDataLoading(false)
     setPharmecyList(ApiResp);
     // console.log('getPharmecyList ==', ApiResp);
   }
@@ -95,7 +98,10 @@ const PharmacyScreen = () => {
               <Icon name="plus" size={12} color="#ffffff" />
             </View>
         </TouchableOpacity>
+        
         <View>
+      
+        {dataLoading && <Text style={loadingtext}>Loading...</Text>}
           {pharmecyList.map((item, index)=><PharmecyItem key={index} data={item}/>)}
         </View>
       </ScrollView>
@@ -149,6 +155,7 @@ export default PharmacyScreen;
 
 
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
+const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' };
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const saperator = {backgroundColor: '#fff', padding: 10};
 const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};

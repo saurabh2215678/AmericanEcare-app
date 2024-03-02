@@ -24,6 +24,7 @@ const AllergyScreen = () => {
   const [otherAllergy, setOtherAllergy] = useState('');
   const [note, setNote] = useState('');
   const [submitted, setsubmitted] = useState(false);
+  const [dataLoading, setdataLoading] = useState(false);
 
   const getAllergyDropdownList = async () => {
 
@@ -64,11 +65,13 @@ const AllergyScreen = () => {
   }
 
   const getAllergyList = async () => {
+    setdataLoading(true)
     const apiOptions = {
       endpoint: 'front/api/get_patient_allergy',
       data: {patient_id : storeUser.id}
     }
     const ApiResp = await HitApi(apiOptions);
+    setdataLoading(false)
     setAllergyList(ApiResp);
     // console.log('ApiResp ==', ApiResp);
   }
@@ -210,6 +213,7 @@ const AllergyScreen = () => {
             </View>
         </TouchableOpacity>
         <View>
+          {dataLoading && <Text style={loadingtext}>Loading</Text>}
           {allergyList.map((item, index)=><AllergyItem key={index} data={item} deleteAllergy={deleteAllergy}/>)}
         </View>
       </ScrollView>
@@ -332,6 +336,7 @@ const AllergyScreen = () => {
 export default AllergyScreen;
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
+const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' }
 const saperator = {backgroundColor: '#fff', padding: 10};
 const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
