@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container } from "../components";
-import { Pressable, ScrollView, TouchableOpacity, View, Text, Modal, TextInput, Keyboard  } from "react-native";
+import { Pressable, ScrollView, TouchableOpacity, View, Text, Modal, TextInput, Keyboard, ActivityIndicator  } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PharmecyItem from "../components/PharmecyItem";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -24,6 +24,8 @@ const PharmacyScreen = () => {
   const [zipCode, setZipCode] = useState('');
   const [submitted, setsubmitted] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
 
 
   const getPharmecyDropdownList = async () => {
@@ -48,8 +50,8 @@ const PharmacyScreen = () => {
 
   },[zipCode]);
 
-  const getPharmecyList = async () => {
-    setDataLoading(true)
+  const getPharmecyList = async (firstLoading) => {
+    setDataLoading(firstLoading)
     const apiOptions = {
       endpoint: 'front/api/patient_pharmacy',
       data: { patient_id : storeUser.id},
@@ -63,14 +65,14 @@ const PharmacyScreen = () => {
 
   const savePharmacy = async () => {
     setsubmitted(true);
-    
+    setSaveLoading(true);
       const apiOptions = {
         endpoint: 'front/api/patient_pharmacy_save',
         data: { patient_id : storeUser.id, pharmacy_id: selectedPharmecy},
         withStatus: true
       }
       const ApiResp = await HitApi(apiOptions);
-      setAddMoal(false);
+      
       if(ApiResp.status === "success"){
         getPharmecyList();
         Toast.show({
@@ -83,11 +85,24 @@ const PharmacyScreen = () => {
           text1: "Something went wrong"
         });
       }
-    
+      setAddMoal(false);
+      setSaveLoading(false);
+  }
+
+  const handleDelete = async (id) => {
+    setDeleteLoading(id);
+    const apiOptions = {
+      endpoint: 'front/api/patient_pharmacy_delete',
+      data: { id },
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+
+    getPharmecyList();
   }
 
   useEffect(()=>{
-    getPharmecyList();
+    getPharmecyList(true);
   },[]);
 
   return(
@@ -101,8 +116,8 @@ const PharmacyScreen = () => {
         
         <View>
       
-        {dataLoading && <Text style={loadingtext}>Loading...</Text>}
-          {pharmecyList.map((item, index)=><PharmecyItem key={index} data={item}/>)}
+        {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
+          {pharmecyList.map((item, index)=><PharmecyItem key={index} data={item} handleDelete={handleDelete} deleteLoading={deleteLoading}/>)}
         </View>
       </ScrollView>
       <Modal
@@ -133,9 +148,13 @@ const PharmacyScreen = () => {
                 {(submitted && (!selectedPharmecy || (selectedPharmecy === -1))) && <Text style={errorStyle}>Pharmacy is Required</Text>}
 
                 <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                  {saveLoading ?
+                  <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                    <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+                  </TouchableOpacity>:
                   <TouchableOpacity style={buttonStyle} onPress={savePharmacy}>
                     <Text style={buttonTextStyle}>Save</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity>}
                   <View style={saperator}></View>
                   <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
                     <Text style={buttonTextStyle}>Cancel</Text>
@@ -166,3 +185,4 @@ const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 const optionStyle = { fontSize: 14 }
 const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative', borderBottomWidth:1, borderColor: '#ababab', }
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

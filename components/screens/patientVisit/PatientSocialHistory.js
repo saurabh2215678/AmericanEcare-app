@@ -1,10 +1,7 @@
-import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput } from "react-native";
+import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput, ActivityIndicator } from "react-native";
 import { Container } from "../components";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useEffect, useState } from "react";
-import MedicalHistoryItem from "../components/MedicalHistoryItem";
-import { Picker } from "@react-native-picker/picker";
-import ModalSelector from "react-native-modal-selector-searchable";
 import { HitApi } from "../../../utils";
 import { useSelector } from "react-redux";
 import PatientHistoryItem from "../components/PatientHistoryItem";
@@ -15,7 +12,6 @@ const radiosOption = ["Yes", "No", "Quit", "Never", "Unknown"];
 const PatientSocialHistory = () =>{
     const storeUser = useSelector((state) => state.user.userData)
     const [addModal, setAddMoal] = useState(false);
-    const [selectBox, setSelectBox] = useState();
     const [updating, setUpdating] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
@@ -29,7 +25,11 @@ const PatientSocialHistory = () =>{
     const [travelOutOfCountry, setTravelOutOfCountry] = useState();
     const [outCountryNotes, setOutCountryNotes] = useState();
 
+    const [dataLoading, setDataLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+
     const PastSocialHistoryUpdate = async () => {
+        setSaving(true);
         const apiOptions = {
             endpoint: 'front/api/PastSocialHistoryUpdate',
             data: {
@@ -48,7 +48,7 @@ const PatientSocialHistory = () =>{
         const ApiResp = await HitApi(apiOptions);
         setAddMoal(false);
         getPastSocialHistory();
-        console.log('updated...', ApiResp);
+        setSaving(false);
     }
 
     const handleUpdate = (data) => {
@@ -72,18 +72,20 @@ const PatientSocialHistory = () =>{
         }
     }
 
-    const getPastSocialHistory = async () =>{
+    const getPastSocialHistory = async (firstLoading) =>{
+        setDataLoading(firstLoading)
         const apiOptions = {
             endpoint: 'front/api/getPastSocialHistory',
             data: {patient_id: storeUser.id}
         }
         const ApiResp = await HitApi(apiOptions);
         setPatientHistory(ApiResp);
+        setDataLoading(false)
     }
 
     useEffect(()=>{
         if(storeUser.id){
-            getPastSocialHistory();
+            getPastSocialHistory(true);
         }
     },[storeUser]);
 
@@ -113,6 +115,7 @@ const PatientSocialHistory = () =>{
                     </View>
                 </TouchableOpacity>
                 <View>
+                    {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
                     {patientHistory && <PatientHistoryItem data={patientHistory} handleUpdate={handleUpdate}/>}
                 </View>
             </ScrollView>
@@ -126,7 +129,7 @@ const PatientSocialHistory = () =>{
                     <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setAddMoal(false)}/>
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
-                            <Text style={headlineStyle}>Add Patinent Social History</Text>
+                            <Text style={headlineStyle}>{updating ? 'Edit' : 'Add'} Patinent Social History</Text>
                             <View style={spacer}></View>
                             <View style={selectWrapper}>
                                 <Text>Did you use tobacco?</Text>
@@ -159,9 +162,13 @@ const PatientSocialHistory = () =>{
 
                             </View>
                             <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                                {saving ?
+                                <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                                    <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+                                </TouchableOpacity>:
                                 <TouchableOpacity style={buttonStyle} onPress={validateAndSaveSocialHistory}>
                                     <Text style={buttonTextStyle}>Save</Text>
-                                </TouchableOpacity>
+                                </TouchableOpacity>}
                                 <View style={saperator}></View>
                                 <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
                                     <Text style={buttonTextStyle}>Cancel</Text>
@@ -180,11 +187,8 @@ const buttonTextStyle = {color: '#fff', fontSize: 14};
 const saperator = {backgroundColor: '#fff', padding: 10};
 const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
-const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
+const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 0, paddingTop:4, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
-const optionStyle = { fontSize: 14 }
-const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
-const bgWhiteStyle = {backgroundColor: '#fff'}
-const updatingInitialValueStyle = {color: '#000'}
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

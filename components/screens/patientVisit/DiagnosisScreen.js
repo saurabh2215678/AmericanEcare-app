@@ -1,4 +1,4 @@
-import { ScrollView, Modal, View, Pressable, Text, TouchableWithoutFeedback, Keyboard, TouchableOpacity, TextInput } from "react-native";
+import { ScrollView, Modal, View, Pressable, Text, TouchableWithoutFeedback, Keyboard, TouchableOpacity, TextInput, ActivityIndicator } from "react-native";
 import { Container } from "../components";
 import DiagnosisItem from "../components/DiagnosisItem";
 import { useEffect, useState } from "react";
@@ -19,6 +19,8 @@ const DiagnosisScreen = () => {
     const [submitted, setsubmitted] = useState(false);
     const [updating, setUpdating] = useState(false);
     const [dataLoading, setDataLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     const getDiaognsisListByKeyword = async (keyword) => {
         const apiOptions = {
@@ -55,8 +57,8 @@ const DiagnosisScreen = () => {
           }
     }
 
-    const getDiagnosis = async () => {
-        setDataLoading(true);
+    const getDiagnosis = async (firstLoading) => {
+        setDataLoading(firstLoading);
         const apiOptions = {
             endpoint: 'front/api/getDiagnosis',
             data: {
@@ -73,6 +75,7 @@ const DiagnosisScreen = () => {
     }
 
     const createDiagnosis = async () => {
+        setSaving(true);
         const apiOptions = {
             endpoint: 'front/api/SaveDiagnosis',
             data: {
@@ -85,6 +88,7 @@ const DiagnosisScreen = () => {
           const ApiResp = await HitApi(apiOptions);
           setAddMoal(false);
           getDiagnosis();
+          setSaving(false);
     }
 
     const validateAndSaveDiagnosis = () =>{
@@ -99,6 +103,7 @@ const DiagnosisScreen = () => {
     }
 
     const updateDiagnosis = async () => {
+        setSaving(true);
         const diagnosisName = selectedDiagnosis ? selectedDiagnosis.label : updating.data.diagnosis;
         const apiOptions = {
             endpoint: 'front/api/SaveDiagnosis',
@@ -117,6 +122,7 @@ const DiagnosisScreen = () => {
           })
           setAddMoal(false);
           getDiagnosis();
+          setSaving(false);
     }
 
     useEffect(()=>{
@@ -125,7 +131,7 @@ const DiagnosisScreen = () => {
 
     useEffect(()=>{
         if(storeUser.id){
-            getDiagnosis();
+            getDiagnosis(true);
         }
     },[storeUser]);
 
@@ -147,6 +153,7 @@ const DiagnosisScreen = () => {
     },[addModal]);
 
     const deleteDiagnose = async (id) => {
+        setDeleting(id);
         const apiOptions = {
             endpoint: 'front/api/DeleteDiagnosis',
             data: {
@@ -173,8 +180,8 @@ const DiagnosisScreen = () => {
                     </View>
                 </TouchableOpacity>
                 <View>
-                    {dataLoading && <Text style={loadingtext}>Loading...</Text>}
-                    {diagnoseList.map((item, index)=><DiagnosisItem key={index} data={item} handleUpdate={handleUpdate} handleDelete={deleteDiagnose} />)}
+                    {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
+                    {diagnoseList.map((item, index)=><DiagnosisItem key={index} data={item} handleUpdate={handleUpdate} handleDelete={deleteDiagnose} deleting={deleting} />)}
                 </View>
             </ScrollView>
             <Modal
@@ -187,7 +194,7 @@ const DiagnosisScreen = () => {
                         <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setAddMoal(false)}/>
                         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                             <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
-                                <Text style={headlineStyle}>Add Diagnosis</Text>
+                                <Text style={headlineStyle}>{updating ? 'Edit' : 'Add'} Diagnosis</Text>
                                 <View style={spacer}></View>
                                 <View style={selectWrapper}>
                                 <ModalSelector
@@ -196,7 +203,7 @@ const DiagnosisScreen = () => {
                                     supportedOrientations={['landscape']}
                                     accessible={true}
                                     value={selectedDiagnosis}
-                                    placeHolderTextColor="red"
+                                    placeHolderTextColor="#666666"
                                     scrollViewAccessibilityLabel={'Scrollable options'}
                                     cancelButtonAccessibilityLabel={'Cancel Button'}
                                     onChange={(val)=>setSelectedDiagnosis(val)}
@@ -205,8 +212,10 @@ const DiagnosisScreen = () => {
                                     sectionStyle = {bgWhiteStyle}
                                     cancelStyle = {bgWhiteStyle}
                                     searchStyle = {bgWhiteStyle}
-                                    initValueTextStyle = {updating ? updatingInitialValueStyle : {}}
+                                    initValueTextStyle = {updating ? updatingInitialValueStyle : selectTextStyle}
+                                    selectTextStyle={selectTextStyle}
                                     onChangeSearch = {handleDiagnoseSearchChange}
+                                    selectStyle={ selectBoxStyle }
                                     >
 
                                 </ModalSelector>
@@ -216,9 +225,13 @@ const DiagnosisScreen = () => {
                                 <TextInput placeholder="Note" value={note} style={InputStyle} onChangeText={(text)=>setNote(text)}  returnKeyType="done" />
                                 {(submitted && !note) && <Text style={errorStyle}>Note is Required</Text>}
                                 <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                                    {saving ?
+                                    <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                                        <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+                                    </TouchableOpacity>:
                                     <TouchableOpacity style={buttonStyle} onPress={validateAndSaveDiagnosis}>
                                         <Text style={buttonTextStyle}>Save</Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity>}
                                     <View style={saperator}></View>
                                     <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
                                         <Text style={buttonTextStyle}>Cancel</Text>
@@ -241,9 +254,9 @@ const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borde
 const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
-const optionStyle = { fontSize: 14 }
-const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' }
-const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
 const bgWhiteStyle = {backgroundColor: '#fff'}
-const updatingInitialValueStyle = {color: '#000'}
+const updatingInitialValueStyle = {color: '#000', fontSize: 14, width:"100%", textAlign:"left"}
+const selectBoxStyle = {borderWidth: 0, borderBottomWidth: 1, borderColor: "#ababab", borderRadius:0, padding:0, paddingBottom: 4}
+const selectTextStyle = {fontSize: 14, width:"100%", textAlign:"left"}
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

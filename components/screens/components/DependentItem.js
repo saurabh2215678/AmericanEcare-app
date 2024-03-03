@@ -1,4 +1,4 @@
-import { Text, View,TouchableOpacity, Modal, Pressable, TextInput, Platform } from "react-native";
+import { Text, View,TouchableOpacity, Modal, Pressable, TextInput, Platform, ActivityIndicator } from "react-native";
 import { HitApi, calculateAge } from "../../../utils";
 import { useEffect, useRef, useState } from "react";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,7 +20,11 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
     const [deleting, setDeleting] = useState(false); 
     const [selectedDate, setSelectedDate] = useState(new Date(timestamp)); 
 
+    const [updateLoading, setUpdateLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
     const updateDependentApi = async () => {
+      setUpdateLoading(true)
         const apiOptions = {
           endpoint: 'front/api/save_dependent',
           data: { ...formData, id: data.id },
@@ -29,6 +33,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
         const ApiResp = await HitApi(apiOptions);
         setUpdateMoal(false);
         getDependentApi(formData.patient_id);
+        setUpdateLoading(false)
         Toast.show({
           type: 'success',
           text1: ApiResp.msg
@@ -63,6 +68,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
       };
 
     const deleteDependent = async () =>{
+      setDeleteLoading(true);
       setDeleting({id: data.id});
       const apiOptions = {
         endpoint: 'front/api/delete_dependent',
@@ -143,9 +149,13 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
                     <TouchableOpacity onPress={()=>setUpdateMoal(true)}>
                         <Icon name="pencil" size={18} color="#030303" />
                     </TouchableOpacity>
+                   {deleteLoading ?
+                    <TouchableOpacity style={{marginLeft: 12}} onPress={()=>{}}>
+                      <ActivityIndicator size="small" color="red" />
+                    </TouchableOpacity>:
                     <TouchableOpacity style={{marginLeft: 12}} onPress={deleteDependent}>
                         <Icon name="trash" size={18} color="red" />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
                 </View>
             </View>
 
@@ -158,7 +168,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setUpdateMoal(false)}/>
           <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={headlineStyle}>Add Patient Dependent</Text>
+            <Text style={headlineStyle}>Edit Patient Dependent</Text>
             
             <TextInput placeholder="First Name" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_first_name')} value={getInputValue('dependent_first_name')}  returnKeyType="next" onSubmitEditing={() => focusNextInput(middleNameInputRef)} />
             {(submitted && !formData['dependent_first_name']) && <Text style={errorStyle}>First Name is Required</Text>}
@@ -206,9 +216,13 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
             {/* <TextInput placeholder="Gender" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'gender')} ref={(input) => (genderInputRef = input)} returnKeyType="done" onSubmitEditing={AddPatientDependent}/> */}
             {(submitted && !formData['gender']) && <Text style={errorStyle}>Gender is Required</Text>}
             <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+              {updateLoading ? 
+              <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+              <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+            </TouchableOpacity> :
               <TouchableOpacity style={buttonStyle} onPress={UpdatePatientDependent}>
                 <Text style={buttonTextStyle}>Save</Text>
-              </TouchableOpacity>
+              </TouchableOpacity>}
               <View style={saperator}></View>
               <TouchableOpacity style={buttonStyle} onPress={()=>setUpdateMoal(false)}>
                 <Text style={buttonTextStyle}>Cancel</Text>
@@ -257,6 +271,7 @@ const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize:
 const spacer = {padding: 10}
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const dependentItemStyle = {paddingHorizontal: 16, paddingVertical: 8, paddingBottom: 10, backgroundColor: '#fff', marginHorizontal: 15, marginBottom: 12, borderRadius: 8}
 const viewSidebySide = {flexDirection: 'row'}
 const bottomStyle = {flexDirection: 'row', justifyContent: 'space-between'}

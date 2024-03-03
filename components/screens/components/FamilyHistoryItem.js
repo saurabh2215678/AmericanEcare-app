@@ -18,7 +18,7 @@ const FamilyHistoryItem = ({data, handleUpdate, handleDelete}) =>{
                     <TouchableOpacity onPress={()=>handleUpdate(data)}>
                         <Icon name="pencil" size={18} color="#030303" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={{marginLeft: 12}} onPress={()=>handleDelete(data.id)}>
+                    <TouchableOpacity style={{marginLeft: 12}} onPress={()=>{}}>
                         <Icon name="trash" size={18} color="red" />
                     </TouchableOpacity>
                 </View>

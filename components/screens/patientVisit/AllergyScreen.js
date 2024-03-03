@@ -1,4 +1,4 @@
-import { Keyboard, Modal, Pressable, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View, TextInput} from "react-native";
+import { Keyboard, Modal, Pressable, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View, TextInput, ActivityIndicator} from "react-native";
 import { Container } from "../components/index";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useEffect, useState } from "react";
@@ -25,6 +25,8 @@ const AllergyScreen = () => {
   const [note, setNote] = useState('');
   const [submitted, setsubmitted] = useState(false);
   const [dataLoading, setdataLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const getAllergyDropdownList = async () => {
 
@@ -64,8 +66,8 @@ const AllergyScreen = () => {
     }
   }
 
-  const getAllergyList = async () => {
-    setdataLoading(true)
+  const getAllergyList = async (firstLoading) => {
+    setdataLoading(firstLoading)
     const apiOptions = {
       endpoint: 'front/api/get_patient_allergy',
       data: {patient_id : storeUser.id}
@@ -118,6 +120,7 @@ const AllergyScreen = () => {
   }
 
   const saveAllergy = async () =>{
+    setSaving(true);
     const apiOptions = {
       endpoint: 'front/api/save_allergy',
       data: {
@@ -143,9 +146,11 @@ const AllergyScreen = () => {
         text1: "Allergy Not Saved"
       });
     }
+    setSaving(false);
   }
 
   const deleteAllergy = async (id) =>{
+    setDeleting(id);
     const apiOptions = {
       endpoint: 'front/api/delete_allergy',
       data: {id},
@@ -199,7 +204,7 @@ const AllergyScreen = () => {
 
   useEffect(()=>{
     if(storeUser?.id){
-      getAllergyList();
+      getAllergyList(true);
     }
   },[storeUser]);
 
@@ -213,8 +218,8 @@ const AllergyScreen = () => {
             </View>
         </TouchableOpacity>
         <View>
-          {dataLoading && <Text style={loadingtext}>Loading</Text>}
-          {allergyList.map((item, index)=><AllergyItem key={index} data={item} deleteAllergy={deleteAllergy}/>)}
+          {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
+          {allergyList.map((item, index)=><AllergyItem key={index} data={item} deleteAllergy={deleteAllergy} deleting={deleting}/>)}
         </View>
       </ScrollView>
       <Modal
@@ -230,33 +235,26 @@ const AllergyScreen = () => {
                 <Text style={headlineStyle}>Add Medication</Text>
                 <View style={spacer}></View>
                 <View style={selectWrapper}>
-                <Picker
-                    selectedValue={selectBox}
-                    onValueChange={(itemValue, itemIndex) => setselectBox(itemValue)}
-                    style={selectStyle}
-                  >
-                    <Picker.Item label="Self" value="1" style={optionStyle} />
-                    <Picker.Item label="ghnb, vhhb" value="2" style={optionStyle} />
-                    <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
- 
-                  </Picker>
+                  <View style={selStyle}>
+                    <Picker
+                        selectedValue={selectBox}
+                        onValueChange={(itemValue, itemIndex) => setselectBox(itemValue)}
+                        style={selectStyle}
+                      >
+                        <Picker.Item label="Self" value="1" style={optionStyle} />
+                        <Picker.Item label="ghnb, vhhb" value="2" style={optionStyle} />
+                        <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
+                      </Picker>
+                  </View>
+                  
                   <View style={spacer}></View>
-                {/* <Picker
-                    selectedValue={selectedAllergy}
-                    // onValueChange={(itemValue,selectBox itemIndex) => setselectedAllergy(itemValue)}
-                    style={selectStyle}
-                  >
-                    {allergyDropDownList.map((item)=> <Picker.Item key={item['id']} label={item["description "]} value={item['id']} style={optionStyle} />)}
-                    
- 
-                </Picker> */}
                 <ModalSelector
                         data={allergyDropDownList}
                         initValue="Select Medical Allergis"
                         supportedOrientations={['landscape']}
                         accessible={true}
                         value={selectedAllergy}
-                        placeHolderTextColor="red"
+                        placeHolderTextColor="#666666"
                         scrollViewAccessibilityLabel={'Scrollable options'}
                         cancelButtonAccessibilityLabel={'Cancel Button'}
                         onChange={(val)=>setselectedAllergy(val)}
@@ -265,9 +263,14 @@ const AllergyScreen = () => {
                         sectionStyle = {bgWhiteStyle}
                         cancelStyle = {bgWhiteStyle}
                         searchStyle = {bgWhiteStyle}
+                        selectStyle={ selectBoxStyle }
                         onChangeSearch = {handleSearchChange}
                         >
-
+                        <TextInput
+                          style={{borderWidth:0, borderBottomWidth:1, borderColor:'#ababab', paddingVertical:6}}
+                          pointerEvents="none"
+                          placeholder="Select Medical Allergis"
+                          value={selectedAllergy?.label} />
                     </ModalSelector>
                 {(submitted && !selectedAllergy) && <Text style={errorStyle}>Medical Allergy is Required</Text>}
                 <View style={spacer}></View>
@@ -277,7 +280,7 @@ const AllergyScreen = () => {
                         supportedOrientations={['landscape']}
                         accessible={true}
                         value={selectedMedicalSeverity}
-                        placeHolderTextColor="red"
+                        placeHolderTextColor="#666666"
                         scrollViewAccessibilityLabel={'Scrollable options'}
                         cancelButtonAccessibilityLabel={'Cancel Button'}
                         onChange={(val)=>setSelectedMedicalSeverity(val)}
@@ -286,7 +289,13 @@ const AllergyScreen = () => {
                         sectionStyle = {bgWhiteStyle}
                         cancelStyle = {bgWhiteStyle}
                         searchStyle = {bgWhiteStyle}
+                        selectStyle={ selectBoxStyle }
                         >
+                        <TextInput
+                          style={{borderWidth:0, borderBottomWidth:1, borderColor:'#ababab', paddingVertical:6}}
+                          pointerEvents="none"
+                          placeholder="Select Medical Severity"
+                          value={selectedMedicalSeverity?.label} />
                     </ModalSelector>
                 {(submitted && !selectedMedicalSeverity) && <Text style={errorStyle}>Medical Severity is Required</Text>}
                 <View style={spacer}></View>
@@ -296,7 +305,7 @@ const AllergyScreen = () => {
                         supportedOrientations={['landscape']}
                         accessible={true}
                         value={selectedReaction}
-                        placeHolderTextColor="red"
+                        placeHolderTextColor="#666666"
                         scrollViewAccessibilityLabel={'Scrollable options'}
                         cancelButtonAccessibilityLabel={'Cancel Button'}
                         onChange={(val)=>setSelectedReaction(val)}
@@ -305,20 +314,30 @@ const AllergyScreen = () => {
                         sectionStyle = {bgWhiteStyle}
                         cancelStyle = {bgWhiteStyle}
                         searchStyle = {bgWhiteStyle}
+                        selectStyle={ selectBoxStyle }
                         >
+                        <TextInput
+                          style={{borderWidth:0, borderBottomWidth:1, borderColor:'#ababab', paddingVertical:6}}
+                          pointerEvents="none"
+                          placeholder="Select Reaction"
+                          value={selectedReaction?.label} />
                     </ModalSelector>
                     {(submitted && !selectedReaction) && <Text style={errorStyle}>Reaction is Required</Text>}
+                    <View style={spacer}></View>
+                    <TextInput placeholder="Other Allergy" value={otherAllergy} style={InputStyle} onChangeText={(text)=>setOtherAllergy(text)}  returnKeyType="next" onSubmitEditing={() => focusNextInput(noteRef)} />
+                    <View style={spacer}></View>
+                    <TextInput placeholder="Note" value={note} style={InputStyle} onChangeText={(text)=>setNote(text)}  returnKeyType="done" ref={(input) => (noteRef = input)} />
+                    {(submitted && !note) && <Text style={errorStyle}>Note is Required</Text>}
                 </View>
-                <View style={spacer}></View>
-                <TextInput placeholder="Other Allergy" value={otherAllergy} style={InputStyle} onChangeText={(text)=>setOtherAllergy(text)}  returnKeyType="next" onSubmitEditing={() => focusNextInput(noteRef)} />
-                <View style={spacer}></View>
-                <TextInput placeholder="Note" value={note} style={InputStyle} onChangeText={(text)=>setNote(text)}  returnKeyType="done" ref={(input) => (noteRef = input)} />
-                {(submitted && !note) && <Text style={errorStyle}>Note is Required</Text>}
 
                 <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                  {saving ? 
+                  <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                    <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+                  </TouchableOpacity>:
                   <TouchableOpacity style={buttonStyle} onPress={validateAndSaveAllergy}>
                     <Text style={buttonTextStyle}>Save</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity>}
                   <View style={saperator}></View>
                   <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
                     <Text style={buttonTextStyle}>Cancel</Text>
@@ -338,12 +357,15 @@ const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', 
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' }
 const saperator = {backgroundColor: '#fff', padding: 10};
-const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
+const InputStyle = {width: '100%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
-const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
-const spacer = {padding: 10}
+const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 4, fontSize: 12, color: 'red'}
+const spacer = {padding: 8}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 const optionStyle = { fontSize: 14 }
-const selectStyle = {margin: -16, marginBottom: -8}
+const selectStyle = {margin: -16, marginBottom: -8, }
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
 const bgWhiteStyle = {backgroundColor: '#fff'}
+const selectBoxStyle = {borderWidth: 0, borderBottomWidth: 1}
+const selStyle = {borderBottomWidth:1, borderColor: '#ababab'}
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

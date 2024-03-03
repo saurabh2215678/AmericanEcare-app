@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput } from "react-native";
+import { ScrollView, TouchableOpacity, View, ActivityIndicator, Text, TextInput } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Container } from "./commonComponents";
 import { HitApi, focusNextInput } from "../../../utils";
@@ -12,6 +12,8 @@ const VitalHistory = () => {
     const [formData, setFormData] = useState({});
     const [submitted, setsubmitted] = useState(false);
     const [bmi, setBmi] = useState("");
+    const [dataLoading, setDataLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleTextChange = (text, fieldName) => {
         const newFormData = {...formData, [fieldName] : text};
@@ -22,6 +24,7 @@ const VitalHistory = () => {
     }
 
     const saveVitalSign = async () => {
+        setSaving(true);
         const apiOptions = {
             endpoint: 'front/api/save_vital_sign',
             data: formData,
@@ -33,6 +36,7 @@ const VitalHistory = () => {
             type: 'success',
             text1: ApiResp.msg
         });
+        setSaving(false);
     }
 
     const validateAndSave = () => {
@@ -54,6 +58,7 @@ const VitalHistory = () => {
     }
 
     const getVitalSign = async () => {
+        setDataLoading(true)
         const apiOptions = {
             endpoint: 'front/api/get_vital_sign',
             data: {
@@ -63,6 +68,7 @@ const VitalHistory = () => {
         const ApiResp = await HitApi(apiOptions);
         setFormData({...ApiResp, patient_id: storeUser.id})
         setBmi(ApiResp.bmi)
+        setDataLoading(false);
     }
 
     const getBmi = async () => {
@@ -79,7 +85,7 @@ const VitalHistory = () => {
     }
     useEffect(()=>{
         if(storeUser){
-            getVitalSign();
+            getVitalSign(true);
         }
     },[storeUser]);
 
@@ -103,7 +109,8 @@ const VitalHistory = () => {
                     </View>
                 </TouchableOpacity>
 
-                <View style={{paddingHorizontal: 16}}>
+                <View style={{paddingHorizontal: 16, position: " relative"}}>
+                    {dataLoading && <View style={formoverlay}><ActivityIndicator size="large" color="#33BAD8" /></View>} 
                     <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '100%', alignItems: 'center', justifyContent: 'center'}}>
 
                         <Text style={labelStyle}>Weight</Text>
@@ -162,9 +169,13 @@ const VitalHistory = () => {
                         {(submitted && !formData['o2sat']) && <Text style={errorStyle}>o2sat is Required</Text>}
 
                         {updating && <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                            {saving ? 
+                            <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                                <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+                            </TouchableOpacity>:
                             <TouchableOpacity style={buttonStyle} onPress={validateAndSave}>
                                 <Text style={buttonTextStyle}>Update</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                         </View>}
                     </View>
                 </View>
@@ -175,15 +186,10 @@ const VitalHistory = () => {
 export default VitalHistory;
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
-const saperator = {backgroundColor: '#fff', padding: 10};
 const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
-const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
 const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
-const optionStyle = { fontSize: 14 }
-const selectStyle = {margin: -16, marginBottom: -8}
-const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
-const bgWhiteStyle = {backgroundColor: '#fff'}
-const updatingInitialValueStyle = {color: '#000'}
 const labelStyle = {fontSize: 14, color: '#616161', width: "90%"}
+const formoverlay = {position:"absolute", top: 15, left: 0, width:"100%", height: "100%", backgroundColor:"#fff9", zIndex: 9, flex: 1, alignItems: "center", justifyContent: "center"}
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

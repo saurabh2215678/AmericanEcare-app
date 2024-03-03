@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, Modal, Pressable, TextInput, Platform } from "react-native";
+import { TouchableOpacity, View, Text, Modal, Pressable, TextInput, Platform, ActivityIndicator } from "react-native";
 import { Container } from "../components";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useEffect, useState } from "react";
@@ -22,6 +22,9 @@ const DependentScreen = () =>{
   const [selectedAgeDependent, setSelectedAgeDependent] = useState(-1);
   const [selectedDate, setSelectedDate] = useState(); 
 
+  const [listLoading, setListLoading] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+
 
   const genders = [
     {label: 'Male', value:'male'},
@@ -29,7 +32,7 @@ const DependentScreen = () =>{
   ];
 
   const addDependentApi = async () => {
-
+    setAddLoading(true);
     const apiOptions = {
       endpoint: 'front/api/save_dependent',
       data: { ...formData },
@@ -42,15 +45,18 @@ const DependentScreen = () =>{
       type: 'success',
       text1: ApiResp.msg
     });
+    setAddLoading(false);
   }
 
-  const getDependentApi = async (patientId) => {
+  const getDependentApi = async (patientId, firstLoading) => {
+      setListLoading(firstLoading);
     const apiOptions = {
       endpoint: 'front/api/get_patient_dependent',
       data: { patient_id : patientId }
     }
     const ApiResp = await HitApi(apiOptions);
     setDependentList(ApiResp);
+    setListLoading(false);
   }
 
   const AddPatientDependent = async () =>{
@@ -104,7 +110,7 @@ const DependentScreen = () =>{
   const getPatientId = async () =>{
     const value = await AsyncStorage.getItem('user_id');
     setFormData({...formData, 'patient_id': value});
-    getDependentApi(value)
+    getDependentApi(value, true)
   }
 
   useEffect(()=>{
@@ -129,8 +135,9 @@ const DependentScreen = () =>{
             </View>
           </TouchableOpacity>
           <View>
+            {listLoading && <ActivityIndicator size="large" color="#33BAD8" />}
             {DependentList.map((item, index)=><DependentItem key={index} data={item} selected={selectedAgeDependent === item.id} setSelected={setSelectedAgeDependent} getDependentApi={getDependentApi}/>)}
-            {/* {DependentList.map((item, index)=><Text key={index}>hello</Text>)} */}
+            
           </View>
         </ScrollView>
         <Modal
@@ -187,9 +194,13 @@ const DependentScreen = () =>{
             {/* <TextInput placeholder="Gender" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'gender')} ref={(input) => (genderInputRef = input)} returnKeyType="done" onSubmitEditing={AddPatientDependent}/> */}
             {(submitted && !formData['gender']) && <Text style={errorStyle}>Gender is Required</Text>}
             <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+              {addLoading ? 
+              <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+              </TouchableOpacity>:
               <TouchableOpacity style={buttonStyle} onPress={AddPatientDependent}>
                 <Text style={buttonTextStyle}>Save</Text>
-              </TouchableOpacity>
+              </TouchableOpacity>}
               <View style={saperator}></View>
               <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
                 <Text style={buttonTextStyle}>Cancel</Text>
@@ -211,4 +222,5 @@ const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borde
 const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 export default DependentScreen;
