@@ -1,6 +1,11 @@
 import axios from "axios";
 import { Strings } from "./components/screens/utils";
 import moment from "moment";
+import mime from 'react-native-mime-types';
+// import RNFetchBlob from 'rn-fetch-blob';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import {shareAsync} from "expo-sharing"
 
 export const SideBarData = [
     {
@@ -99,6 +104,11 @@ export const SideBarData = [
                 icon: 'linode',
                 navigateTo: 'VitalHistory'
              
+            },
+            {
+                name: 'Documents',
+                icon: 'universal-access',
+                navigateTo: 'PatientDocuments'
             }
         ]
     }
@@ -165,3 +175,74 @@ export const calculateAge = ({ AgeString }) => {
 export const focusNextInput = (nextInputRef) => {
     nextInputRef.focus();
   };
+
+  const getFileExtension = (fileUrl) => {
+    return fileUrl.split('.').pop();
+};
+
+export const downloadFile = async (fileUrl) => {
+    try {
+        const fileExtension = getFileExtension(fileUrl);
+        if (!fileExtension) {
+            console.error('Could not get the file\'s extension.');
+            return null;
+        }
+
+        const fileUri = FileSystem.documentDirectory + `downloadedFile.${fileExtension}`;
+
+        
+        const { uri } = await FileSystem.downloadAsync(fileUrl, fileUri);
+        shareAsync(uri);
+
+        // console.log('File downloaded to:', uri);
+
+        
+        // const { status } = await MediaLibrary.requestPermissionsAsync();
+        
+        // if (status === 'granted') {
+        //     const asset = await MediaLibrary.createAssetAsync(uri, {
+        //         useLegacyExternalStorage: true,
+        //       });
+        //     await MediaLibrary.createAlbumAsync('Downloads', asset, false, { useLegacyExternalStorage: true });
+        //     console.log('File saved to media library.', asset);
+        // } else {
+        //     console.error('Permission to save to media library denied');
+        // }
+
+        // return uri;
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        throw error;
+    }
+};
+
+
+// export const downloadFile = (fileUrl) => {
+//   // Get the file name from the URL
+//   const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+
+//   // Get the mime type based on the file extension
+//   const mimeType = mime.lookup(fileName) || 'application/octet-stream';
+
+//   // Start downloading the file
+//   RNFetchBlob.config({
+//     fileCache: true,
+//     addAndroidDownloads: {
+//       useDownloadManager: true,
+//       notification: true,
+//       title: fileName,
+//       description: 'Downloading file...',
+//       mime: mimeType,
+//       mediaScannable: true,
+//     },
+//   })
+//     .fetch('GET', fileUrl, {})
+//     .then((res) => {
+//       // The file has been downloaded successfully
+//       console.log('File downloaded:', res.path());
+//     })
+//     .catch((error) => {
+//       // Handle errors during the download
+//       console.error('Error downloading file:', error);
+//     });
+// };

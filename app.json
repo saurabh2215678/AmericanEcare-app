@@ -16,17 +16,29 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anmol5.AmericanEcare"
+      "bundleIdentifier": "com.anmol5.AmericanEcare",
+      "permissions": ["NSFileManagement.ReadDirectory", "NSFileManagement.Write"]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anmol5.AmericanEcare"
+      "package": "com.anmol5.AmericanEcare",
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow American ecare to access your photos.",
+          "savePhotosPermission": "Allow American ecare to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ]
   }
 }
