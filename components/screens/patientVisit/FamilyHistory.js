@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import MedicalHistoryItem from "../components/MedicalHistoryItem";
 import { Picker } from "@react-native-picker/picker";
 import ModalSelector from "react-native-modal-selector-searchable";
-import { HitApi } from "../../../utils";
+import { HitApi, focusNextInput } from "../../../utils";
 import { useSelector } from "react-redux";
 import FamilyHistoryItem from "../components/FamilyHistoryItem";
 

@@ -93,6 +93,12 @@ export const SideBarData = [
                 name: 'Family History',
                 icon: 'leaf',
                 navigateTo: 'FamilyHistory'
+            },
+            {
+                name: 'Vital History',
+                icon: 'linode',
+                navigateTo: 'VitalHistory'
+             
             }
         ]
     }
