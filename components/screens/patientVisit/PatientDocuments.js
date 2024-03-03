@@ -1,15 +1,10 @@
-import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput } from "react-native";
+import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, ActivityIndicator } from "react-native";
 import { Container } from "../components";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useEffect, useState } from "react";
-import MedicalHistoryItem from "../components/MedicalHistoryItem";
-import { Picker } from "@react-native-picker/picker";
-import ModalSelector from "react-native-modal-selector-searchable";
-import { HitApi, focusNextInput } from "../../../utils";
+import { HitApi } from "../../../utils";
 import { useSelector } from "react-redux";
-import FamilyHistoryItem from "../components/FamilyHistoryItem";
 import DocumentItem from "../components/DocumentItem";
-import DocumentSelector from "../components/DocumentSelector";
 import * as DocumentPicker from 'expo-document-picker';
 import { Strings } from "../utils";
 import axios from "axios";
@@ -22,7 +17,11 @@ const PatientDocuments = () => {
 
     const [formData, setFormData] = useState({});
 
-    const getPatientDocuments = async () => {
+    const [dataLoading, setDataLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const getPatientDocuments = async (firstLoading) => {
+        setDataLoading(firstLoading);
         const apiOptions = {
             endpoint: 'front/api/getPatientDocuments',
             data: {
@@ -31,6 +30,7 @@ const PatientDocuments = () => {
         }
         const ApiResp = await HitApi(apiOptions);
         setDocumentList(ApiResp);
+        setDataLoading(false)
     }
 
     const handleFileSelect = async (name) => {
@@ -69,6 +69,7 @@ const PatientDocuments = () => {
     }
 
     const SavePatientDocuments = async () => {
+        setSaving(true);
         const ppFormData = new FormData();
         ppFormData.append('patient_id', storeUser.id);
 
@@ -104,13 +105,14 @@ const PatientDocuments = () => {
           setAddMoal(false);
           setFormData({});
           getPatientDocuments();
+          setSaving(false);
     }
 
 
 
     useEffect(()=>{
         if(storeUser.id){
-            getPatientDocuments();
+            getPatientDocuments(true);
         }
     },[storeUser]);
 
@@ -124,6 +126,7 @@ const PatientDocuments = () => {
                 </View>
                 </TouchableOpacity>
                 <View>
+                    {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
                     {documentList.map((item, index)=><DocumentItem key={index} data={item} />)}
                 </View>
             </ScrollView>
@@ -140,28 +143,32 @@ const PatientDocuments = () => {
                             <Text style={headlineStyle}>Add Document</Text>
                             <View style={spacer}></View>
                             <View style={selectWrapper}>
-                                <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>handleFileSelect('lab_result')}>
+                                <TouchableOpacity style={filepickerStyle} onPress={()=>handleFileSelect('lab_result')}>
                                     <Text>{getValue('lab_result')}</Text>
                                 </TouchableOpacity>
                                 {(submitted && !formData['lab_result']) && <Text style={errorStyle}>Lab Result is Required</Text>}
                                 <View style={spacer}></View>
 
 
-                                <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>handleFileSelect('lab_document')}>
+                                <TouchableOpacity style={filepickerStyle} onPress={()=>handleFileSelect('lab_document')}>
                                     <Text>{getValue('lab_document')}</Text>
                                 </TouchableOpacity>
                                 {(submitted && !formData['lab_document']) && <Text style={errorStyle}>Lab Document is Required</Text>}
                                 <View style={spacer}></View>
                                
-                                <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>handleFileSelect('lab_picture')}>
+                                <TouchableOpacity style={filepickerStyle} onPress={()=>handleFileSelect('lab_picture')}>
                                     <Text>{getValue('lab_picture')}</Text>
                                 </TouchableOpacity>
                                 {(submitted && !formData['lab_picture']) && <Text style={errorStyle}>Lab Picture is Required</Text>}
                                 <View style={spacer}></View>
-                                <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
+                                <View style={{flexDirection: 'row', width: '100%', marginTop: 25}}>
+                                    {saving ?
+                                    <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
+                                        <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
+                                    </TouchableOpacity>:
                                     <TouchableOpacity style={buttonStyle} onPress={validateAndSaveDocument}>
                                         <Text style={buttonTextStyle}>Save</Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity>}
                                     <View style={saperator}></View>
                                     <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
                                         <Text style={buttonTextStyle}>Cancel</Text>
@@ -179,13 +186,10 @@ export default PatientDocuments;
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const saperator = {backgroundColor: '#fff', padding: 10};
-const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
-const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
+const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 0, paddingTop: 4, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
 const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
-const optionStyle = { fontSize: 14 }
-const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
-const bgWhiteStyle = {backgroundColor: '#fff'}
-const updatingInitialValueStyle = {color: '#000'}
+const filepickerStyle = {alignSelf: 'flex-start', borderBottomWidth: 1, width: "100%", paddingBottom: 4, borderColor: "#ababab"}
+const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

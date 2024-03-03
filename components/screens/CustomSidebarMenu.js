@@ -21,6 +21,7 @@ import { SideBarData } from '../../utils';
 import NavigationItem from './components/commonComponents/NavigationItem';
 import { useDispatch } from 'react-redux';
 import { logOut } from '../store/userSlice';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const CustomSidebarMenu = (props) => {
     const navigation = useNavigation();
@@ -229,11 +230,12 @@ const CustomSidebarMenu = (props) => {
                   </TouchableOpacity>
                 </View>
                 */}
-                <View style={{backgroundColor: '#eee',padding: 6,marginTop: 10 }}>
-                  <TouchableOpacity onPress={()=>this.logout()}>
-                    <Text>Logout </Text>
-                  </TouchableOpacity>
-                </View> 
+                <TouchableOpacity onPress={()=>this.logout()}>
+                  <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 13, paddingVertical: 10}}>
+                      <Icon style={{width: 25, textAlign: 'center'}} name="power-off" size={23} color="#248A24" />
+                      <Text style={{fontSize: 15, fontWeight: 500, marginLeft: 9}}>Logout </Text>
+                  </View> 
+                </TouchableOpacity>
 
             </DrawerContentScrollView>
         </SafeAreaView>
