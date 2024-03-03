@@ -18,8 +18,15 @@ const PastSurgeryScreen = () => {
   const [surgery, setSurgery] = useState();
   const [other, setOther] = useState();
 
-  const handleDelete = () => {
-    console.log('deleting');
+  const handleDelete = async (id) => {
+    const apiOptions = {
+      endpoint: 'front/api/deletePastSurgeryHistory',
+      data: {id},
+      withStatus: true
+    }
+    const ApiResp = await HitApi(apiOptions);
+    setAddMoal(false);
+    getPastSurgeryHistory();
   }
 
   const getPastSurgeryHistory = async () => {
@@ -38,6 +45,7 @@ const PastSurgeryScreen = () => {
         data: {
           patient_id: storeUser.id,
           surgery_confirm : selectBox,
+          surgery_name : surgery,
           surgery_date : surgeryDate,
           other : other
         }
@@ -57,7 +65,20 @@ const PastSurgeryScreen = () => {
   }
 
   const updatePastSurgeryHistory = async () => {
-    console.log('updating..')
+    const apiOptions = {
+      endpoint: 'front/api/savePastSurgeryHistory',
+      data: {
+        patient_id: storeUser.id,
+        surgery_confirm : selectBox,
+        surgery_name : surgery,
+        surgery_date : surgeryDate,
+        other : other,
+        id : updating.data.id
+      }
+  }
+  const ApiResp = await HitApi(apiOptions);
+  setAddMoal(false);
+  getPastSurgeryHistory();
   }
 
   const validateAndSaveSurgery = () => {

@@ -3,7 +3,7 @@ import { Card } from "react-native-paper";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const FamilyHistoryItem = ({data, handleUpdate, handleDelete}) =>{
-
+    // console.log('iiiittttmmmm ====', data);
     return(
         <Card style={pahrmecyItemStyle}>
             <View style={wrapperStyle}>

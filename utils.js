@@ -88,6 +88,11 @@ export const SideBarData = [
                 name: 'OBGYN',
                 icon: 'universal-access',
                 navigateTo: 'ObgynHistory'
+            },
+            {
+                name: 'Family History',
+                icon: 'leaf',
+                navigateTo: 'FamilyHistory'
             }
         ]
     }
@@ -150,3 +155,7 @@ export const calculateAge = ({ AgeString }) => {
 
     return age;
 };
+
+export const focusNextInput = (nextInputRef) => {
+    nextInputRef.focus();
+  };
