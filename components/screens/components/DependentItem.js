@@ -8,6 +8,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card } from "react-native-paper";
 import moment from "moment";
 import Toast from "react-native-toast-message";
+import DeleteConfirm from "./commonComponents/DeleteConfirm";
 
 const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
     const relationshipInputRef = useRef(null);
@@ -133,6 +134,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
 
     return(
         <Card style={dependentItemStyle}>
+          <DeleteConfirm/>
             <View style={viewSidebySide}>
                 <View style={boxLeftStyle}>
                     <Text>Dependent Name: {data['dependent_first_name']}</Text>
