@@ -5,43 +5,31 @@ import { Text, View,TouchableOpacity, StyleSheet, Modal, Pressable, TextInput, P
 
 
 
-const DeleteConfirm = () => {
-    const [updateModal, setUpdateMoal] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false); // Use clear variable names
-
-  const handleOpenModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
-  };
-
+const DeleteConfirm = ({deleteModal, setDeleteMoal, deletefn}) => {
 
   return (
     <>
-        <TouchableOpacity onPress={()=>setUpdateMoal(true)}>
-                        <Text>hhhhh</Text>
-                        
-                    </TouchableOpacity>
-                    <Modal
-    visible={updateModal}
+     <Modal
+    visible={deleteModal}
     animationType="fade"
-    onRequestClose={()=>setUpdateMoal(false)}
+    onRequestClose={()=>setDeleteMoal(false)}
     transparent
   >
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-    <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setUpdateMoal(false)}/>
+    <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setDeleteMoal(false)}/>
     <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
       <Text style={headlineStyle}>Are You Sure</Text>
-      <TouchableOpacity style={buttonStyle} >
-                <Text style={buttonTextStyle}>Save</Text>
-              </TouchableOpacity>
-              <View style={saperator}></View>
-              <TouchableOpacity style={buttonStyle} >
-                <Text style={buttonTextStyle}>Cancel</Text>
-              </TouchableOpacity>
-    
+      <View style={{flexDirection:'row', padding:10,}}>
+        <TouchableOpacity style={buttonStyle} onPress={deletefn}>
+          <Text style={buttonTextStyle}>Ok</Text>
+        </TouchableOpacity>
+        <View style={saperator}></View>
+        <TouchableOpacity style={buttonStyle} onPress={()=>setDeleteMoal(false)} >
+          <Text style={buttonTextStyle}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+      
+              
     </View>
    </View>
    </Modal>

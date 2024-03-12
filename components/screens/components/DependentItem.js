@@ -8,18 +8,20 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Card } from "react-native-paper";
 import moment from "moment";
 import Toast from "react-native-toast-message";
-import DeleteConfirm from "./commonComponents/DeleteConfirm";
+import DeleteConfirm from "./commonComponents/DeleteConfirm"; //DeleteConfirm 0
 
 const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
     const relationshipInputRef = useRef(null);
     var timestamp = moment(data.dependent_dob, "MM/DD/YYYY").toDate();
     const [updateModal, setUpdateMoal] = useState(false);
+    const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
     const [formData, setFormData] = useState({...data});
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [genderDropDownOpened, setGenderDropDownOpened] = useState(false);
     const [submitted, setsubmitted] = useState(false);
     const [deleting, setDeleting] = useState(false); 
     const [selectedDate, setSelectedDate] = useState(new Date(timestamp)); 
+   
 
     const [updateLoading, setUpdateLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -46,6 +48,11 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
         setFormData({...formData, dependent_dob : formattedDateString});
       },[selectedDate])
 
+      useEffect(()=>{
+        if(!deleteModal){
+          setDeleteLoading(false)
+        }
+      },[deleteModal]) //DeleteConfirm 2
 
     const UpdatePatientDependent = async () =>{
         setsubmitted(true);
@@ -79,6 +86,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
       const ApiResp = await HitApi(apiOptions);
       setDeleting(null);
       getDependentApi(formData.patient_id);
+      setDeleteMoal(false) //DeleteConfirm 3
     }
 
     const genders = [
@@ -134,7 +142,8 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
 
     return(
         <Card style={dependentItemStyle}>
-          <DeleteConfirm/>
+          <DeleteConfirm deleteModal={deleteModal} setDeleteMoal={setDeleteMoal} deletefn={deleteDependent}/>
+           {/* DeleteConfirm 4 */}
             <View style={viewSidebySide}>
                 <View style={boxLeftStyle}>
                     <Text>Dependent Name: {data['dependent_first_name']}</Text>
@@ -155,9 +164,10 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
                     <TouchableOpacity style={{marginLeft: 12}} onPress={()=>{}}>
                       <ActivityIndicator size="small" color="red" />
                     </TouchableOpacity>:
-                    <TouchableOpacity style={{marginLeft: 12}} onPress={deleteDependent}>
+                    <TouchableOpacity style={{marginLeft: 12}} onPress={()=>setDeleteMoal(true)}>
                         <Icon name="trash" size={18} color="red" />
                     </TouchableOpacity>}
+                    {/* DeleteConfirm 5 */}
                 </View>
             </View>
 
