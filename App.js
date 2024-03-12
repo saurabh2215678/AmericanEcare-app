@@ -36,6 +36,9 @@ import ObgynHistory from "./components/screens/patientVisit/ObgynHistory";
 import FamilyHistory from "./components/screens/patientVisit/FamilyHistory";
 import VitalHistory from "./components/screens/components/VitalHistory";
 import PatientDocuments from "./components/screens/patientVisit/PatientDocuments";
+import SelectProviderScreen from "./components/screens/patientVisit/SelectProviderScreen";
+import ReasonScreen from "./components/screens/patientVisit/ReasonScreen";
+import SymptomsScreen from "./components/screens/patientVisit/SymptomsScreen";
 const Drawer = createDrawerNavigator();
 
 
@@ -65,6 +68,9 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="FamilyHistory" component={FamilyHistory} />
         <Drawer.Screen name="VitalHistory" component={VitalHistory} />
         <Drawer.Screen name="PatientDocuments" component={PatientDocuments} />
+        <Drawer.Screen name="SelectProviderScreen" component={SelectProviderScreen} />
+        <Drawer.Screen name="ReasonScreen" component={ReasonScreen} />
+        <Drawer.Screen name="SymptomsScreen" component={SymptomsScreen} />
         <Drawer.Screen name="Login" component={Login} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999999999}}/>
