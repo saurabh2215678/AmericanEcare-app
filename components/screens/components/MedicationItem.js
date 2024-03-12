@@ -1,10 +1,16 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native"
 import { Card } from "react-native-paper";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import DeleteConfirm from "./commonComponents/DeleteConfirm"; //DeleteConfirm 0
+import { useEffect, useRef, useState } from "react";
 
 const MedicationItem = ({data, deleteMedication, deleting}) =>{
+    const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
+
     return(
         <Card style={pahrmecyItemStyle}>
+              <DeleteConfirm deleteModal={deleteModal} setDeleteMoal={setDeleteMoal} deletefn={()=>deleteMedication(data.id)}/>
+           {/* DeleteConfirm 4 */}
             <View style={wrapperStyle}>
                 <View style={starStyle}>
                     <Text>Drug Name : {data['drugs_name']}</Text>
@@ -15,7 +21,7 @@ const MedicationItem = ({data, deleteMedication, deleting}) =>{
                     <TouchableOpacity style={{marginLeft: 12}} onPress={()=>{}}>
                         <ActivityIndicator size="small" color="red" />
                     </TouchableOpacity>:
-                    <TouchableOpacity onPress={()=>deleteMedication(data.id)}>
+                    <TouchableOpacity onPress={()=>setDeleteMoal(true)}>
                         <Icon name="trash" size={20} color="red" />
                     </TouchableOpacity>}
                 </View>

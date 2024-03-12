@@ -9,6 +9,7 @@ import { TouchableWithoutFeedback } from "react-native";
 import { useSelector } from 'react-redux';
 import Toast from "react-native-toast-message";
 
+
 const defaultSelectOption = {"id": -1, "pharmacy_name": "Select Pharmacy"};
 const defaultSelectLoadOption = {"id": -1, "pharmacy_name": "Loading..."};
 const defaultSelectNoOption = {"id": -1, "pharmacy_name": "No Pharmacy"};
@@ -26,7 +27,7 @@ const PharmacyScreen = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-
+  const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
 
   const getPharmecyDropdownList = async () => {
     setPharmecySelectData([defaultSelectLoadOption]);
@@ -97,7 +98,7 @@ const PharmacyScreen = () => {
       withStatus: true
     }
     const ApiResp = await HitApi(apiOptions);
-
+    setDeleteMoal(false) //DeleteConfirm 3
     getPharmecyList();
   }
 

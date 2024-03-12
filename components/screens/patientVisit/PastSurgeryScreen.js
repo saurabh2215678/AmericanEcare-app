@@ -7,6 +7,7 @@ import { HitApi, focusNextInput } from "../../../utils";
 import { useSelector } from "react-redux";
 import PastsurgeryItem from "../components/Pastsurgeryitem";
 
+
 const PastSurgeryScreen = () => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
@@ -20,6 +21,7 @@ const PastSurgeryScreen = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
 
   const handleDelete = async (id) => {
     setDeleting(id)
@@ -31,6 +33,7 @@ const PastSurgeryScreen = () => {
     const ApiResp = await HitApi(apiOptions);
     setAddMoal(false);
     getPastSurgeryHistory();
+    setDeleteMoal(false) //DeleteConfirm 3
   }
 
   const getPastSurgeryHistory = async (firstLoading) => {

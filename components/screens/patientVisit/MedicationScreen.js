@@ -27,6 +27,7 @@ const MedicationScreen = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
 
   const populateDrugsDropDown = async () => {
     setMedicationDropdownListState('loading')
@@ -81,6 +82,7 @@ const MedicationScreen = () => {
       label: "success",
       text1: 'Successfully deleted'
     })
+    setDeleteMoal(false) //DeleteConfirm 3
     getMedicationList(storeUser.id);
   }
 
