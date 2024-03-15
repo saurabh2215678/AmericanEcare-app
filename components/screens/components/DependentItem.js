@@ -18,6 +18,7 @@ const DependentItem = ({data, selected, setSelected, getDependentApi}) => {
     const [formData, setFormData] = useState({...data});
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [genderDropDownOpened, setGenderDropDownOpened] = useState(false);
+   
     const [submitted, setsubmitted] = useState(false);
     const [deleting, setDeleting] = useState(false); 
     const [selectedDate, setSelectedDate] = useState(new Date(timestamp)); 

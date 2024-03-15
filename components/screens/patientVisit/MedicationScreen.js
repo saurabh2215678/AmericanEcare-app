@@ -208,7 +208,7 @@ const MedicationScreen = () => {
         </TouchableOpacity>
 
         <View>
-        
+        aa
           {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
           {medicationList.map((item, index)=><MedicationItem key={index} data={item} deleteMedication={deleteMedication} deleting={deleting}/>)}
         </View>

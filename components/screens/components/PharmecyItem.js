@@ -5,7 +5,7 @@ import DeleteConfirm from "./commonComponents/DeleteConfirm"; //DeleteConfirm 0
 import { useEffect, useRef, useState } from "react";
 
 
-const PharmecyItem = ({data, handleDelete, deleting}) =>{
+const PharmecyItem = ({data,  handleDelete, deleting}) =>{
 const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
 const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -28,7 +28,7 @@ const [deleteLoading, setDeleteLoading] = useState(false);
                 </View>
                 
                 <View>
-                    {deleting == data.id ?
+                {deleteLoading ?
                     <TouchableOpacity style={{marginLeft: 12}} onPress={()=>{}}>
                         <ActivityIndicator size="small" color="red" />
                     </TouchableOpacity>:

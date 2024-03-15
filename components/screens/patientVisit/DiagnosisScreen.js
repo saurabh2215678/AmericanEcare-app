@@ -21,6 +21,8 @@ const DiagnosisScreen = () => {
     const [dataLoading, setDataLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
+
 
     const getDiaognsisListByKeyword = async (keyword) => {
         const apiOptions = {
@@ -169,6 +171,7 @@ const DiagnosisScreen = () => {
           })
           setAddMoal(false);
           getDiagnosis();
+          setDeleteMoal(false) //DeleteConfirm 3
     }
 
     return(

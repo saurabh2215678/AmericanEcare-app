@@ -143,6 +143,7 @@ const MedicalHistoryScreen = () => {
     const ApiResp = await HitApi(apiOptions);
     setAddMoal(false);
     getPastMedicalHistory();
+    setDeleteMoal(false) //DeleteConfirm 3
   }
 
   useEffect(()=>{

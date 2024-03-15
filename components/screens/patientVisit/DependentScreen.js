@@ -18,6 +18,7 @@ const DependentScreen = () =>{
   const [submitted, setsubmitted] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [genderDropDownOpened, setGenderDropDownOpened] = useState(false);
+  const [relationshipDropDownOpened, setRelationshipDropDownOpened] = useState(false);
   const [DependentList, setDependentList] = useState([]);
   const [selectedAgeDependent, setSelectedAgeDependent] = useState(-1);
   const [selectedDate, setSelectedDate] = useState(); 
@@ -29,6 +30,12 @@ const DependentScreen = () =>{
   const genders = [
     {label: 'Male', value:'male'},
     {label: 'Female', value:'female'}
+  ];
+
+  const relationship = [
+    {label: 'Spouse', value:'spouse'},
+    {label: 'Daughter', value:'daughter'},
+    {label: 'Son', value:'son'}
   ];
 
   const addDependentApi = async () => {
@@ -170,13 +177,29 @@ const DependentScreen = () =>{
             <TextInput placeholder="DOB" style={InputStyle} value={selectedDate ? selectedDate.toDateString() : ''} onFocus={()=>setShowDatePicker(true)} ref={(input) => (dobInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(relationshipInputRef)} />
             {(submitted && !formData['dependent_dob']) && <Text style={errorStyle}>DOB is Required</Text>}
             <View style={spacer}></View>
-            <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} ref={(input) => (relationshipInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(phoneInputRef)}/>
-            {(submitted && !formData['dependent_relationship']) && <Text style={errorStyle}>Relationship is Required</Text>}
+
+            {/* <TextInput placeholder="Relationship" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'dependent_relationship')} ref={(input) => (relationshipInputRef = input)} returnKeyType="next" onSubmitEditing={() => focusNextInput(phoneInputRef)}/>
+            {(submitted && !formData['dependent_relationship']) && <Text style={errorStyle}>Relationship is Required</Text>} */}
+            <View style={{justifyContent : 'center', width: '90%', zIndex: relationshipDropDownOpened ? 1 : 0 }}>
+            <DropDownPicker
+              items={relationship}
+              open={relationshipDropDownOpened}
+              setOpen={()=>setRelationshipDropDownOpened(!relationshipDropDownOpened)}
+              value={formData['dependent_relationship']}
+              onSelectItem={(val)=>handleTextChange(val.value, 'dependent_relationship')}
+              showTickIcon={true}
+              disableBorderRadius={true}
+              style={{ borderRadius: 0,  marginHorizontal:0, borderWidth:0, borderBottomWidth: 1, borderColor: '#ababab', minHeight: 20, paddingHorizontal: 0, paddingVertical: 0,  paddingBottom:5}}
+              textStyle={{color: formData['dependent_relationship'] ? '#000' : '#adadad'}}
+              listItemLabelStyle={{color: '#1c1e21'}}
+              placeholder="Select Relationship"
+            />
+          </View>
             <View style={spacer}></View>
             <TextInput placeholder="Phone Number" style={InputStyle} onChangeText={(text)=>handleTextChange(text, 'patient_phone')} ref={(input) => (phoneInputRef = input)} returnKeyType="done"/>
             {(submitted && !formData['patient_phone']) && <Text style={errorStyle}>Phone No is Required</Text>}
             <View style={spacer}></View>
-            <View style={{justifyContent : 'center', width: '90%'}}>
+            <View style={{justifyContent : 'center', width: '90%', zIndex: genderDropDownOpened ? 1 : 0 }}>
             <DropDownPicker
               items={genders}
               open={genderDropDownOpened}
