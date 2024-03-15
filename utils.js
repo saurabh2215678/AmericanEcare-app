@@ -18,7 +18,7 @@ export const SideBarData = [
         icon: 'user-circle',
         submenu:[
             {
-                name: 'Personal Information x',
+                name: 'Personal Information',
                 icon: 'id-card',
                 navigateTo: 'EditProfileScreen'
             },
@@ -38,11 +38,11 @@ export const SideBarData = [
         name: 'My Health Record',
         icon: 'circle',
         submenu:[
-            {
-                name: 'Primary Doctor',
-                icon: 'user-md',
-                navigateTo: null
-            },
+            // {
+            //     name: 'Primary Doctor',
+            //     icon: 'user-md',
+            //     navigateTo: null
+            // },
             {
                 name: 'Insurance',
                 icon: 'universal-access',
@@ -59,16 +59,16 @@ export const SideBarData = [
                 navigateTo: 'ImmunizationScreen'
              
             },
-            {
-                name: 'Medication',
-                icon: 'leaf',
-                navigateTo: 'MedicationScreen'
-            },
-            {
-                name: 'Allergy',
-                icon: 'forumbee',
-                navigateTo: 'AllergyScreen'
-            },
+            // {
+            //     name: 'Medication',
+            //     icon: 'leaf',
+            //     navigateTo: 'MedicationScreen'
+            // },
+            // {
+            //     name: 'Allergy',
+            //     icon: 'forumbee',
+            //     navigateTo: 'AllergyScreen'
+            // },
             {
                 name: 'Diagnosis',
                 icon: 'file-text',
