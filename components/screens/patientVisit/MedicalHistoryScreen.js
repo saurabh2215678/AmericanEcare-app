@@ -1,277 +1,479 @@
-import { ScrollView, TouchableOpacity, View, Modal, Pressable, TouchableWithoutFeedback, Keyboard, Text, TextInput } from "react-native";
-import { Container } from "../components";
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { useEffect, useState } from "react";
-import MedicalHistoryItem from "../components/MedicalHistoryItem";
-import { Picker } from "@react-native-picker/picker";
-import ModalSelector from "react-native-modal-selector-searchable";
-import { HitApi, focusNextInput } from "../../../utils";
-import { useSelector } from "react-redux";
-import { ActivityIndicator } from "react-native";
+import React, { useState,useEffect } from 'react';
+import {View, Text, StyleSheet,TextInput,StatusBar,ScrollView, Pressable,ImageBackground,Alert,TouchableOpacity,SafeAreaView,Modal,FlatList,RefreshControl} from 'react-native';
+import {Container,AppHeader,Input,Button} from '../components';
+import Styles from '../styles/LoginRegiesterStyle/RegisterScreenStyle';
+import Style from '../styles/CommonStyle/Style';
+import images from '../images';
+//import { useSelector } from "react-redux";
+import { SH, Strings } from '../utils';
+import { Dropdown } from 'react-native-element-dropdown';
+//import AntDesign from '@expo/vector-icons/AntDesign';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios';
 
 
-const MedicalHistoryScreen = () => {
-  const storeUser = useSelector((state) => state.user.userData)
-  const [addModal, setAddMoal] = useState(false);
-  const [selectBox, setselectBox] = useState();
-  const [updating, setUpdating] = useState(false);
-  const [submitted, setsubmitted] = useState(false);
-  const [medicalHistoryList, setMedicalHistoryList] = useState([]);
-  const [dieasesDropDownList, setDieasesDropDownList] = useState([]);
-  const [selectedDieases, setSelectedDieases] = useState();
-  const [age, setAge] = useState();
-  const [comment, setComment] = useState();
-  const [dataLoading, setDataLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const getDieasesListByKeyword = async (keyword) => {
-    const apiOptions = {
-        endpoint: 'front/api/search_dieases_with_keywords',
-        data: { searchTerm :  keyword},
-        withStatus: true
-    }
-    const ApiResp = await HitApi(apiOptions);
-    if(ApiResp.length > 1){
-        let index = 0;
-        const dpdata = [];
-        ApiResp.forEach(element => {
-          const modifiedItem = {key: index++, label: element['text'], data: element};
-          dpdata.push(modifiedItem);
-        });
-        setDieasesDropDownList(dpdata);
-      }
-  }
-
-  const getTwentyDieasesList = async () => {
-    const apiOptions = {
-        endpoint: 'front/api/getTwentydieasesList',
-        data: {},
-        withStatus: true
-    }
-    const ApiResp = await HitApi(apiOptions);
-    if(ApiResp.length > 1){
-        let index = 0;
-        const dpdata = [];
-        ApiResp.forEach(element => {
-          const modifiedItem = {key: index++, label: element['text'], data: element};
-          dpdata.push(modifiedItem);
-        });
-        setDieasesDropDownList(dpdata);
-      }
-  }
-
-  const getPastMedicalHistory = async (firstLoading) => {
-    setDataLoading(firstLoading);
-    const apiOptions = {
-        endpoint: 'front/api/get_patient_past_medical_history',
-        data: {
-          patient_id: storeUser.id
-        }
-    }
-    const ApiResp = await HitApi(apiOptions);
-    setMedicalHistoryList(ApiResp);
-    setDataLoading(false);
-  }
-
-  const handleDieasesSearchChange = (val) => {
-    getDieasesListByKeyword(val);
-  }
-
-  const updatePastMedicalHistory = async () => {
-    setSaving(true);
-    const diagnosisName = selectedDieases ? selectedDieases.label : updating.data.illness;
-    const apiOptions = {
-        endpoint: 'front/api/save_patient_past_medical_history',
-        data: {
-          patient_id: storeUser.id,
-          illness : diagnosisName,
-          onset_age : age,
-          comment : comment,
-          id : updating.data.id
-        }
-    }
-    const ApiResp = await HitApi(apiOptions);
-    setAddMoal(false);
-    getPastMedicalHistory();
-    setSaving(false);
-  }
-
-  const savePastMedicalHistory = async () => {
-    setSaving(true);
-    const apiOptions = {
-        endpoint: 'front/api/save_patient_past_medical_history',
-        data: {
-          patient_id: storeUser.id,
-          illness : selectedDieases.label,
-          onset_age : age,
-          comment : comment
-        }
-    }
-    const ApiResp = await HitApi(apiOptions);
-    setAddMoal(false);
-    getPastMedicalHistory();
-    setSaving(false);
-    }
+const MedicalHistoryScreen = ({route,navigation}) => {
+    const API_URL = Strings.baseUrl.url;
+   
+    const [DisplayAlert, setDisplayAlert] = useState(0)
+    const [dieaseData, setdieaseData] = useState([]);
+    const [diease, setUserdiease] = useState([]);
+    const [pastMedicalHistoryApi, setpastMedicalHistoryApi] = useState([]);
+    const [onset_age, setonset_age] = useState('');
+    const [comment, set_comment] = useState('');
+    const [patientId, setpatientId] = useState("");
+   
+   // const [visitTypes, setuservisitTypes] = useState('');
+    const [value, setValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(true);
+    const { request_type} = route.params;
 
 
-  const validateAndSaveDiagnosis = () =>{
-      setsubmitted(true);
-      if(updating && (age?.length > 0) && (comment?.length > 0)){
-          updatePastMedicalHistory();
-          return;
-      }
-      if(selectedDieases && (age?.length > 0) && (comment?.length > 0)){
-        savePastMedicalHistory()
-      }
-  }
-
-  const handleUpdate = (data) => {
-      setAddMoal(true);
-      setAge(data.onset_age);
-      setComment(data.comment);
-      setUpdating({data});
-  }
-
-  const handleDelete = async (id) => {
-    setDeleting(id);
-    const apiOptions = {
-      endpoint: 'front/api/delete_patient_past_medical_history',
-      data: {id},
-      withStatus: true
-    }
-    const ApiResp = await HitApi(apiOptions);
-    setAddMoal(false);
-    getPastMedicalHistory();
-    setDeleteMoal(false) //DeleteConfirm 3
-  }
-
-  useEffect(()=>{
-      if(storeUser.id){
-          getPastMedicalHistory(true);
-      }
-  },[storeUser]);
-
-  useEffect(()=>{
-    getTwentyDieasesList();
-  },[]);
-
-  useEffect(()=>{
-      if(!addModal){
-          setUpdating(false);
-          setSelectedDieases(null);
-          setsubmitted(false);
-          setAge(null);
-          setComment(null);
-          getTwentyDieasesList();
-      }
-  },[addModal]);
-
-
-
-  return(
-    <Container>
-      <ScrollView style={fullDependent}>
-        <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>setAddMoal(true)}>
-              <View style={{backgroundColor: '#33BAD8', paddingHorizontal:7, paddingVertical: 6, margin: 8, borderRadius: 3 }}>
-                <Icon name="plus" size={12} color="#ffffff" />
-              </View>
-          </TouchableOpacity>
-          <View>
-            {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
-            {medicalHistoryList.map((item, index)=><MedicalHistoryItem key={index} data={item} handleUpdate={handleUpdate} handleDelete={handleDelete} deleting={deleting} />)}
-          </View>
-      </ScrollView>
-      <Modal
-        visible={addModal}
-        animationType="fade"
-        onRequestClose={()=>setAddMoal(false)}
-        useNativeDriver={true}
-        transparent>
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Pressable style={{height: 100, backgroundColor: '#000', opacity: 0.5, position: 'absolute', width: '100%', height: '100%'}} onPress={()=>setAddMoal(false)}/>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={{backgroundColor: '#FFF', borderRadius:5, paddingBottom: 25, paddingTop:10, width: '80%', alignItems: 'center', justifyContent: 'center'}}>
-                <Text style={headlineStyle}>{updating ? 'Edit' : 'Add'} Patinent Past Medical History</Text>
-                <View style={spacer}></View>
-                <View style={selectWrapper}>
-                  <View style={selStyle}>
-                    <Picker
-                      selectedValue={selectBox}
-                      onValueChange={(itemValue, itemIndex) => setselectBox(itemValue)}
-                      style={selectStyle}
-                    >
-                      <Picker.Item label="Self" value="1" style={optionStyle} />
-                      <Picker.Item label="ghnb, vhhb" value="2" style={optionStyle} />
-                      <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
   
-                    </Picker>
-                  </View>
-                  <View style={spacer}></View>
-                  <ModalSelector
-                        data={dieasesDropDownList}
-                        initValue={updating?.data?.illness ? updating.data.illness : "Select Dieases"}
-                        supportedOrientations={['landscape']}
-                        accessible={true}
-                        value={selectedDieases}
-                        placeHolderTextColor="#666666"
-                        scrollViewAccessibilityLabel={'Scrollable options'}
-                        cancelButtonAccessibilityLabel={'Cancel Button'}
-                        onChange={(val)=>setSelectedDieases(val)}
-                        optionContainerStyle = {bgWhiteStyle}
-                        optionStyle = {bgWhiteStyle}
-                        sectionStyle = {bgWhiteStyle}
-                        cancelStyle = {bgWhiteStyle}
-                        searchStyle = {bgWhiteStyle}
-                        initValueTextStyle = {updating ? updatingInitialValueStyle : selectTextStyle}
-                        selectTextStyle={selectTextStyle}
-                        onChangeSearch = {handleDieasesSearchChange}
-                        selectStyle={ selectBoxStyle }
-                        >
-                    </ModalSelector>
-                    {(submitted && !selectedDieases && !updating) && <Text style={errorStyle}>Dieases is Required</Text>}
-                    <View style={spacer}></View>
-                    <TextInput placeholder="Onset Age" value={age} style={InputStyle} onChangeText={(text)=>setAge(text)}  returnKeyType="next" onSubmitEditing={() => focusNextInput(commentInputRef)} />
-                    {(submitted && !age) && <Text style={errorStyle}>Onset Age is Required</Text>}
-                    <View style={spacer}></View>
-                    <TextInput placeholder="Comment" value={comment} style={InputStyle} onChangeText={(text)=>setComment(text)}  returnKeyType="done" ref={(input) => (commentInputRef = input)} />
-                    {(submitted && !comment) && <Text style={errorStyle}>Comment is Required</Text>}
-                </View>
-                <View style={{flexDirection: 'row', width: '90%', marginTop: 25}}>
-                    {saving ?
-                    <TouchableOpacity style={loadingbuttonStyle} onPress={()=>{}}>
-                      <Text style={buttonTextStyle}><ActivityIndicator size="small" color="#33BAD8" /></Text>
-                    </TouchableOpacity>:
-                    <TouchableOpacity style={buttonStyle} onPress={validateAndSaveDiagnosis}>
-                        <Text style={buttonTextStyle}>Save</Text>
-                    </TouchableOpacity>}
-                    <View style={saperator}></View>
-                    <TouchableOpacity style={buttonStyle} onPress={()=>setAddMoal(false)}>
-                        <Text style={buttonTextStyle}>Cancel</Text>
-                    </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-      </Modal>
-    </Container>
-  )
+const getDieases = () => {
+    // Function to get the value from AsyncStorage
+
+         var config = {
+          method: 'get',
+          url: API_URL+`front/api/all_dieases`,
+          headers: {
+            'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8',
+          },
+        };
+
+        axios(config)
+        .then(response => {
+      
+        var count = Object.keys(response.data.data).length;
+     
+        let dieasesArray = [];
+        for (var i = 0; i < count; i++) {
+          dieasesArray.push({
+            label: response.data.data[i].dieases_name,
+            value: response.data.data[i].dieases_name,
+          });
+        }
+        setdieaseData(dieasesArray);
+
+        })
+      .catch(error => {
+        console.log("all dieases API ERROR",error);
+      });
+  };
+  
+
+const getPatienPastMedicalHistory = () => {
+    // Function to get the value from AsyncStorage
+         let axiosConfig = {
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+              }
+            };
+            const body = { patient_id: patientId };
+
+            axios.post(API_URL+'front/api/get_patient_past_medical_history', body, axiosConfig)
+             .then((responseJson) => {
+
+                  var history_count = Object.keys(responseJson.data.data).length;
+                  let pastMedicalHistoryArray = [];
+                  for (var i = 0; i < history_count; i++) {
+                    pastMedicalHistoryArray.push({
+                      id: responseJson.data.data[i].id,
+                      illness: responseJson.data.data[i].illness,
+                      onset_age: responseJson.data.data[i].onset_age,
+                      comment: responseJson.data.data[i].comment,
+                    });
+                  }
+               setRefreshing(false);
+               setpastMedicalHistoryApi(pastMedicalHistoryArray);
+
+                })
+             .catch(err => console.log('pastMedicalHistoryArray API: ', err));
+        };
+
+
+
+const getPatientId = async () => {
+  try {
+    const value = await AsyncStorage.getItem('user_id');
+
+    if (value !== null) {
+      setpatientId(value);
+    }
+  } catch (e) {
+    alert('Failed to fetch the input from storage');
+  }
+}; 
+
+const onRefresh = () => {
+    //Clear old data of the list
+    setpastMedicalHistoryApi([]);
+    //Call the Service to get the latest data
+    getPatienPastMedicalHistory();
+  };
+
+const saveMedicalHistory=()=>{
+  //alert(diease);
+   // navigation.navigate("ReasonScreen");
+   if(diease=="")
+   {
+    alert("Please Select diease");
+   }
+
+   if(onset_age=="")
+   {
+    alert("Please Enter Age");
+   }
+
+  setLoading(true); // Set loading before sending API request
+
+   let axiosConfig = {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+     };
+   
+     const body = {patient_id: patientId, illness:diease, onset_age:onset_age,comment:comment};
+
+      axios.post(API_URL+'front/api/save_patient_past_medical_history', body, axiosConfig)
+             .then((responseJson) => {
+
+              if(responseJson.status == 200)
+              {
+                   setLoading(false); // Stop loading
+                   Alert.alert(
+                      'Sucess',
+                      'Past Medical History has been saved Successfully',
+                      [
+                        {
+                          text: '', 
+                          onPress: () => this.refreshMedicalHistory()
+                        },
+                      ],
+                      {cancelable: false},
+                    );
+
+              }
+            })
+         .catch(err => console.log('Past Medical History API Save: ', err));
+
 }
+
+refreshMedicalHistory=(is_delete="")=>{
+  if(is_delete!=1)
+  {
+     setShowModal(!showModal);
+      setLoading(true); 
+  }
+  setLoading(false); 
+  
+   getPatienPastMedicalHistory();
+   navigation.navigate("MedicalHistoryScreen",{request_type: request_type});
+}
+
+
+const delete_past_medical_history_confirm =(id)=>{
+  return Alert.alert(
+      "Are your sure?",
+      "Are you sure you want to remove this?",
+      [
+        // The "Yes" button
+        {
+          text: "Yes",
+          onPress: () => {
+            delete_past_medical_history(id);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+        },
+      ]
+    );
+}
+
+const delete_past_medical_history =(id)=>{
+
+  let axiosConfig = {
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+              }
+            };
+  const body = { id: id };
+
+   axios.post(API_URL+'front/api/delete_patient_past_medical_history', body, axiosConfig)
+             .then((responseJson) => {
+
+                if(responseJson.status == 200)
+                  {
+                    Alert.alert(
+                      'Sucess',
+                      'Delete Successfully',
+                      [
+                        {text: '', onPress: () => this.refreshMedicalHistory(1)},
+                      ],
+                      {cancelable: false},
+                    );
+                  }
+               
+
+            })
+             .catch(err => console.log('Delete Past medical history API: ', err));
+
+};
+
+const backPress=()=>{
+  navigation.navigate("SymptomsScreen",{
+      request_type: request_type,
+  });
+}
+
+
+
+
+useEffect(() => {
+  getPatientId();
+  getDieases();
+  getPatienPastMedicalHistory();
+}, [patientId]);
+
+    
+  return (
+
+  	 <Container>
+            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+          
+                <View style={Style.setheaderspacepadding}>
+                   <AppHeader
+                        leftImage={images.back_image}
+                        title="Medical History"
+                        onLeftPress={() => backPress()} />
+                </View>
+               
+          <SafeAreaView>
+              <View style={styles.container}>
+                <Modal
+                  animationType={'slide'}
+                  transparent={false}
+                  visible={showModal}
+                  onRequestClose={() => {
+                    console.log('Modal has been closed.');
+
+                  }}>
+                 
+                  <View style={styles.modal}>
+                    <Text style={styles.text}>Add Patient Past Medical History</Text>
+
+                     <Dropdown
+                        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        iconStyle={styles.iconStyle}
+                        data={dieaseData}
+                        search
+                        maxHeight={200}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus ? 'Select Diease' : '...'}
+                        placeholderTextColor="#fff" 
+                        searchPlaceholder="Search Diease..."
+                        value={value}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={item => {
+                          setUserdiease(item.value);
+                          setIsFocus(false);
+                        }}
+                      />
+  
+
+                  <Input
+                      placeholder="Onset Age"
+                      onChangeText={(onset_age) => setonset_age(onset_age)}
+                      value={onset_age}
+                      inputStyle={Style.inputMobile}
+                  />
+
+                   <Input
+                      placeholder="Comment"
+                      onChangeText={(comment) => set_comment(comment)}
+                      value={comment}
+                      inputStyle={Style.inputMobile}
+                  />
+
+
+                    <Button
+                      title={loading ? 'Loading...' : 'Save'}
+                      onPress={() => {
+                        saveMedicalHistory();
+                      }}
+                    />
+
+                    <Text style={styles.text}></Text>
+
+
+                    <Button
+                      title="Cancel"
+                      onPress={() => {
+                        setShowModal(!showModal);
+                      }}
+                    />
+                  </View>
+                </Modal>
+                {/*Updating the state to make Modal Visible*/}
+                <Button
+                  title="Add Medical History"
+                  onPress={() => {
+                    setShowModal(!showModal);
+                  }}
+                />
+
+                 <Text style={styles.text}></Text>
+
+                 <Button
+                  title="Skip and Next"
+                  onPress={() => {
+                    navigation.navigate("MedicationScreen",{
+                      request_type: request_type,
+                    });
+                  }}
+                />
+
+
+
+              </View>
+
+            </SafeAreaView>
+        
+
+          <SafeAreaView style={styles.container}>
+                    <FlatList
+                      data={pastMedicalHistoryApi}
+                      renderItem={({item}) =>  (
+                        <View style={styles.listitems}>
+                        <Text> 
+                         Diease: {item.illness} {"\n"}
+                         Onset Age: {item.onset_age}{"\n"}
+                         Comment: {item.comment}{"\n"}
+                        </Text> 
+                                  <TouchableOpacity onPress={()=>delete_past_medical_history_confirm(item.id)}>
+                                  <View style={styles.button_two}>
+                                    <Text style={styles.buttonTextStyle}>Delete</Text>
+                                  </View>
+                                </TouchableOpacity>
+                                
+
+                      </View> )
+                      }
+                       refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                      }/>
+              </SafeAreaView>
+        </Container>
+  );
+};
+
+const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 32,
+  },
+  buttonStyle: {
+    height: 54,
+    width: '80%',
+    marginTop: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2EE59D',
+    shadowRadius: 5,
+    shadowOpacity: 0.7,
+    shadowColor: 'rgba(46, 229, 157, 0.5)',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+  },
+  buttonTextStyle: {
+    color: 'red',
+    fontWeight: '700',
+  },
+dropdown: {
+      height: 40,
+      borderColor: 'grey',
+      borderWidth: 0.5,
+      paddingHorizontal: 8,
+      backgroundColor: '#fff',
+      borderRadius:10,
+      marginTop: 10,
+      marginBottom: 15,
+      width:'100%'
+
+    },
+    symptomsText:{
+       fontSize: 18,
+       marginBottom: 15,
+       color:'#152549',
+    },
+ modal: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#e3f2f0',
+    padding: 30,
+  },
+  text: {
+    color: '#3f2949',
+    marginTop: 10,
+  },
+  card_container: {
+    flex: 0.5,
+    justifyContent: 'center',
+    padding: 0,
+    
+  },
+    paragraph: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      padding: 20
+    },
+    item: {
+    backgroundColor: '#eee',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+
+  },
+  item_delete:{
+    width:'10%',
+    fontSize: 28,
+  },
+  listitems: {
+    width: "100%",
+    flex:1,
+    marginTop: 5,
+    backgroundColor: "#eee",
+    padding: 10,
+    flexDirection: 'row',
+    justifyContent:'space-between'
+},
+button_two: {
+    width: "100%",
+    alignItems: 'flex-end',
+}
+});
+
 export default MedicalHistoryScreen;
-const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
-const buttonTextStyle = {color: '#fff', fontSize: 14};
-const saperator = {backgroundColor: '#fff', padding: 10};
-const InputStyle = {width: '100%', borderBottomWidth: 1, borderColor: '#ababab'};
-const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
-const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 0, paddingTop:4, fontSize: 12, color: 'red'}
-const spacer = {padding: 10}
-const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
-const optionStyle = { fontSize: 14 }
-const selectStyle = {margin: -16, marginBottom: -8}
-const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative'}
-const bgWhiteStyle = {backgroundColor: '#fff'}
-const updatingInitialValueStyle = {color: '#000', fontSize: 14, width:"100%", textAlign:"left"}
-const selectBoxStyle = {borderWidth: 0, borderBottomWidth: 1, borderColor: "#ababab", borderRadius:0, padding:0, paddingBottom: 4}
-const selectTextStyle = {fontSize: 14, width:"100%", textAlign:"left"}
-const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
-const selStyle = {borderBottomWidth:1, borderColor: '#ababab'}

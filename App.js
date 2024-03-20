@@ -39,6 +39,12 @@ import PatientDocuments from "./components/screens/patientVisit/PatientDocuments
 import SelectProviderScreen from "./components/screens/patientVisit/SelectProviderScreen";
 import ReasonScreen from "./components/screens/patientVisit/ReasonScreen";
 import SymptomsScreen from "./components/screens/patientVisit/SymptomsScreen";
+import VitalScreen from "./components/screens/patientVisit/VitalScreen";
+import DocumentScreen from "./components/screens/patientVisit/DocumentScreen";
+import TermScreen from "./components/screens/patientVisit/TermScreen";
+import PaymentScreen from "./components/screens/patientVisit/PaymentScreen";
+import CardScreen from "./components/screens/patientVisit/CardScreen";
+import ThankyouScreen from "./components/screens/patientVisit/ThankyouScreen";
 const Drawer = createDrawerNavigator();
 
 
@@ -71,6 +77,12 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="SelectProviderScreen" component={SelectProviderScreen} />
         <Drawer.Screen name="ReasonScreen" component={ReasonScreen} />
         <Drawer.Screen name="SymptomsScreen" component={SymptomsScreen} />
+        <Drawer.Screen name="VitalScreen" component={VitalScreen} />
+        <Drawer.Screen name="DocumentScreen" component={DocumentScreen} />
+        <Drawer.Screen name="TermScreen" component={TermScreen} />
+        <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
+        <Drawer.Screen name="CardScreen" component={CardScreen} />
+        <Drawer.Screen name="ThankyouScreen" component={ThankyouScreen} />
         <Drawer.Screen name="Login" component={Login} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999999999}}/>
