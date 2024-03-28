@@ -10,6 +10,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 //import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+import { Card } from 'react-native-paper';
 
 
 const AllergyScreen = ({route,navigation}) => {
@@ -293,6 +294,7 @@ useEffect(() => {
   return (
 
   	 <Container>
+        <SafeAreaView>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
           
                 <View style={Style.setheaderspacepadding}>
@@ -302,8 +304,8 @@ useEffect(() => {
                         onLeftPress={() => navigation.navigate('MedicationScreen',{request_type: request_type})} />
                 </View>
                
-          <SafeAreaView>
-              <View>
+          
+              
                 <Modal
                   animationType={'slide'}
                   transparent={false}
@@ -432,48 +434,49 @@ useEffect(() => {
                   </View>
                 </Modal>
                 {/*Updating the state to make Modal Visible*/}
-                <Button
-                  title="Add Allergy"
-                  onPress={() => {
-                    setShowModal(!showModal);
-                  }}
-                />
-
-                 <Text style={styles.text}></Text>
-
-                 <Button
-                  title="Skip and Next"
-                  onPress={() => {
-                   navigation.navigate("VitalScreen",{request_type: request_type});
-                  }}
-                />
-
-
-
-              </View>
-
-            </SafeAreaView>
-        
-
-          <SafeAreaView style={styles.container}>
+                <View style={styles.btnWrapper}>
+                  <View style={styles.btnInner}>
+                    <Button
+                      style={styles.buttonStyle}
+                      buttonTextStyle={styles.buttonTextStyle}
+                      title="Add Allergy"
+                      onPress={() => {
+                        setShowModal(!showModal);
+                      }}
+                    />
+                  </View>
+                  <View style={styles.btnInner}>
+                    <Button
+                      style={styles.buttonStyle}
+                      buttonTextStyle={styles.buttonTextStyle}
+                      title="Skip and Next"
+                      onPress={() => {
+                      navigation.navigate("VitalScreen",{request_type: request_type});
+                      }}
+                    />
+                  </View>
+                </View>
+  
                     <FlatList
                       data={AllergyApi}
+                      style={styles.flatListStyle}
                       renderItem={({item}) =>  (
-                        <View style={styles.listitems}>
-                        <Text> 
-                         Allergy: {item.medical_allergies} {"\n"}
-                         Severity: {item.severity_name}{"\n"}
-                         Reaction: {item.reaction_type}{"\n"}
-                         Note: {item.notes}{"\n"}
-                        </Text> 
-                                  <TouchableOpacity onPress={()=>delete_allergy_confirm(item.id)}>
-                                  <View style={styles.button_two}>
-                                    <Text style={styles.buttonTextStyle}>Delete</Text>
-                                  </View>
-                                </TouchableOpacity>
-                                
-
-                      </View> )
+                        <Card style={styles.cardStyle}>
+                          <View style={styles.listitems}>
+                              <Text> 
+                              Allergy: {item.medical_allergies} {"\n"}
+                              Severity: {item.severity_name}{"\n"}
+                              Reaction: {item.reaction_type}{"\n"}
+                              Note: {item.notes}{"\n"}
+                              </Text> 
+                                        <TouchableOpacity onPress={()=>delete_allergy_confirm(item.id)}>
+                                        <View style={styles.button_two}>
+                                          <Text style={styles.deleteTextStyle}>Delete</Text>
+                                        </View>
+                                      </TouchableOpacity>
+                          </View>
+                        </Card>
+                         )
                       }
                        refreshControl={
                         <RefreshControl
@@ -485,7 +488,6 @@ useEffect(() => {
         </Container>
   );
 };
-
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
@@ -493,8 +495,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  container:{
+    backgroundColor: "red",
+  },
+  flatListStyle:{
+    backgroundColor: "#e3f2f0",
+    height: "100%"
+  },
+  fullContainer:{
+    backgroundColor: "blue",
+    flex: 1,
+  },
   title: {
     fontSize: 32,
+  },
+  cardStyle:{
+    marginHorizontal: 10,
+    marginVertical: 6,
+    backgroundColor: "#fff"
+  },
+  btnWrapper: {
+    backgroundColor :  "#e3f2f0",
+    flexDirection : "row",
+    justifyContent: "space-between",
+    padding: 10
+  },
+  btnInner:{
+    width: '48%'
   },
   buttonStyle: {
     height: 54,
@@ -513,6 +540,10 @@ const styles = StyleSheet.create({
     },
   },
   buttonTextStyle: {
+    fontSize: 15,
+    fontWeight: '400',
+  },
+  deleteTextStyle: {
     color: 'red',
     fontWeight: '700',
   },
@@ -569,8 +600,6 @@ dropdown: {
   listitems: {
     width: "100%",
     flex:1,
-    marginTop: 5,
-    backgroundColor: "#eee",
     padding: 10,
     flexDirection: 'row',
     justifyContent:'space-between'
@@ -580,5 +609,102 @@ button_two: {
     alignItems: 'flex-end',
 }
 });
+
+
+
+// const styles = StyleSheet.create({
+//   screenContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: '#fff',
+//   },
+//   title: {
+//     fontSize: 32,
+//   },
+//   buttonStyle: {
+//     height: 54,
+//     width: '80%',
+//     marginTop: 32,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     backgroundColor: '#2EE59D',
+//     shadowRadius: 5,
+//     shadowOpacity: 0.7,
+//     shadowColor: 'rgba(46, 229, 157, 0.5)',
+//     shadowOffset: {
+//       width: 0,
+//       height: 3,
+//     },
+//   },
+//   buttonTextStyle: {
+//     color: 'red',
+//     fontWeight: '700',
+//   },
+// dropdown: {
+//       height: 40,
+//       borderColor: 'grey',
+//       borderWidth: 0.5,
+//       paddingHorizontal: 8,
+//       backgroundColor: '#fff',
+//       borderRadius:10,
+//       marginTop: 10,
+//       marginBottom: 15,
+//       width:'100%'
+
+//     },
+//     symptomsText:{
+//        fontSize: 18,
+//        marginBottom: 15,
+//        color:'#152549',
+//     },
+//  modal: {
+//     flex: 1,
+//     alignItems: 'center',
+//     backgroundColor: '#e3f2f0',
+//     padding: 30,
+//   },
+//   text: {
+//     color: '#3f2949',
+//     marginTop: 10,
+//   },
+//   card_container: {
+//     flex: 0.5,
+//     justifyContent: 'center',
+//     padding: 0,
+    
+//   },
+//     paragraph: {
+//       fontSize: 18,
+//       fontWeight: 'bold',
+//       textAlign: 'center',
+//       padding: 20
+//     },
+//     item: {
+//     backgroundColor: '#eee',
+//     padding: 20,
+//     marginVertical: 8,
+//     marginHorizontal: 16,
+
+//   },
+//   item_delete:{
+//     width:'10%',
+//     fontSize: 28,
+//   },
+//   listitems: {
+//     width: "100%",
+//     flex:1,
+//     marginTop: 5,
+//     backgroundColor: "#eee",
+//     padding: 10,
+//     flexDirection: 'row',
+//     justifyContent:'space-between'
+// },
+// button_two: {
+//     width: "100%",
+//     alignItems: 'flex-end',
+// }
+// });
 
 export default AllergyScreen;

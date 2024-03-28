@@ -19,12 +19,16 @@ import images from './images';
 import { SH, Strings } from './utils';
 import Style from './styles/CommonStyle/Style';
 import axios from 'axios';
+import { useDispatch } from "react-redux";
+import { hideHeader } from "../store/headerSlice";
 
 export default function DashboardScreen({ navigation }) {
  const API_URL = Strings.baseUrl.url;
+ const dispatch = useDispatch();
   const [patientId, setpatientId] = useState("");
 
    const startVisitNow = () => {
+    dispatch(hideHeader())
       navigation.navigate("DateAndTimeScreen")
    }
 

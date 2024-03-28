@@ -45,14 +45,15 @@ import TermScreen from "./components/screens/patientVisit/TermScreen";
 import PaymentScreen from "./components/screens/patientVisit/PaymentScreen";
 import CardScreen from "./components/screens/patientVisit/CardScreen";
 import ThankyouScreen from "./components/screens/patientVisit/ThankyouScreen";
+import ChangePasswordScreen from "./components/screens/ChangePasswordScreen";
 const Drawer = createDrawerNavigator();
 
 
-const NewDrawerNavigator = () => {
+const NewDrawerNavigator = ({header}) => {
 
   return (
     <View style={{flex: 1, paddingBottom: 0}}>
-      <Drawer.Navigator  drawerContent={(props) => <CustomSidebarMenu {...props} />}  drawerStyle={{ paddingBottom: 20 }}>
+      <Drawer.Navigator screenOptions={{ headerShown: header }} drawerContent={(props) => <CustomSidebarMenu {...props} />}  drawerStyle={{ paddingBottom: 20 }}>
         <Drawer.Screen name="DashboardScreen" component={HomeTabNavigator} />
         <Drawer.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Drawer.Screen name="DemographicScreen" component={DemographicScreen} />
@@ -83,6 +84,7 @@ const NewDrawerNavigator = () => {
         <Drawer.Screen name="PaymentScreen" component={PaymentScreen} />
         <Drawer.Screen name="CardScreen" component={CardScreen} />
         <Drawer.Screen name="ThankyouScreen" component={ThankyouScreen} />
+        <Drawer.Screen name="ChangePasswordScreen" component={ChangePasswordScreen} />
         <Drawer.Screen name="Login" component={Login} />
       </Drawer.Navigator>
       <Toast style={{zIndex: 99999999999}}/>
@@ -92,6 +94,7 @@ const NewDrawerNavigator = () => {
 
 const AppLayer = () =>{
   const storeUser = useSelector((state) => state.user.userData)
+  const storeHeader = useSelector((state) => state.header.value)
   const dispatch = useDispatch();
 
   const getUser = async () => {
@@ -107,7 +110,7 @@ const AppLayer = () =>{
   return(
     <AutocompleteDropdownContextProvider>
       <NavigationContainer style={{paddingBottom: 10}}>
-          {storeUser ? <NewDrawerNavigator/> :
+          {storeUser ? <NewDrawerNavigator header={storeHeader}/> :
           <StackNavigator />}
       </NavigationContainer>
     </AutocompleteDropdownContextProvider>

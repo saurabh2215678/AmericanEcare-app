@@ -21,7 +21,7 @@ const ReasonScreen = ({route,navigation}) => {
     const [AvailableDoctorsData, setAvailableDoctors] = useState([]);
     const [reason, setReason] = useState("");
     const [visitType, setuservisitTypes] = useState([]);
-    const [other_health_concern, setOtherHealthConcern] = useState([]);
+    const [other_health_concern, setOtherHealthConcern] = useState("");
     const [doctorlist, setdoctorlist] = useState([]);
     const [PatientState, setpatientState] = useState('');
    // const [visitTypes, setuservisitTypes] = useState('');

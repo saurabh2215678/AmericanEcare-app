@@ -18,6 +18,8 @@ import { SH, Strings } from './utils';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import { useIsFocused,useFocusEffect } from "@react-navigation/native"; 
+import { useDispatch } from "react-redux";
+import { hideHeader } from "../store/headerSlice";
 
 
 export default function AccountScreen({ navigation }) {
@@ -34,6 +36,7 @@ const [patient_address, set_patient_address] = useState("");
 const [patient_dob, set_patient_dob] = useState("");
 
 const isFocused = useIsFocused();  // useIsFocused as shown  
+const dispatch = useDispatch();
 
 const getPatientId = async () => {
   try {
@@ -107,6 +110,11 @@ const getPatientId = async () => {
      //alert(patientId)
   }, [patientId],getProfileDetails)
 
+  const handleEdit = () =>{
+    dispatch(hideHeader());
+    navigation.navigate('EditProfileScreen');
+  }
+
 
 
   return (
@@ -131,7 +139,7 @@ const getPatientId = async () => {
                                         
                                     </View>
                                     <TouchableOpacity style={{ right: SH(10) }}
-                                        onPress={() => navigation.navigate('EditProfileScreen')}><Text style={[Styles.editLableStyle, { color: colorrdata }]}>{Strings.Profile.edit}</Text></TouchableOpacity>
+                                        onPress={handleEdit}><Text style={[Styles.editLableStyle, { color: colorrdata }]}>{Strings.Profile.edit}</Text></TouchableOpacity>
                                 </View>
                                 <View style={Styles.sectionView}>
                                     <Image source={images.ic_phone} style={Styles.iconStyle} resizeMode={'contain'} />

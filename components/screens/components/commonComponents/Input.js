@@ -48,7 +48,7 @@ function Input({
   );
   return (
     <View style={styles.container}>
-      <Visibility visible={title}>
+      <Visibility visible={true}>
         <Text style={styles.title_style} {...textprops}>
           {title}
         </Text>

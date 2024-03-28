@@ -19,6 +19,8 @@ import { createDrawerNavigator, DrawerContentScrollView,
   DrawerItemList,DrawerItem} from '@react-navigation/drawer';
 import CustomSidebarMenu from './CustomSidebarMenu';
 import DashboardScreen from './DashboardScreen';
+import { useDispatch } from 'react-redux';
+import { showHeader } from '../store/headerSlice';
 
 
 const Drawer = createDrawerNavigator();
@@ -58,6 +60,7 @@ export default function EditProfileScreen({ navigation }) {
     const [isFocus, setIsFocus] = useState(false);
 
     const [patientId, setpatientId] = useState("");   
+    const dispatch = useDispatch();
 
     
     const onChangeText = (text, type) => {
@@ -156,8 +159,8 @@ const getCSRFToken = async () => {
 
             axios.post(API_URL+'front/api/all_city', body, axiosConfig)
              .then((responseJson) => {
-
-                  var city_count = Object.keys(responseJson.data.data).length;
+               var city_count = Object.keys(responseJson.data.data).length;
+              //  var city_count = 35;
                   let cityArray = [];
                   for (var i = 0; i < city_count; i++) {
                     cityArray.push({
@@ -165,6 +168,7 @@ const getCSRFToken = async () => {
                       value: responseJson.data.data[i].city_id,
                     });
                   }
+                  // console.log('city arr=', cityArray)
                 setCityData(cityArray);     
 
                 })
@@ -366,17 +370,30 @@ const getProfileDetails = async ()=>{
       
       getPatientId();
       getAllStates();
-      getAllCities();
+      // getAllCities();
       getProfileDetails();
        
 
     }, []);
+
+    useEffect(()=>{
+      console.log("STate data ==", State);
+      if(StateData.length > 0 && State){
+        getAllCities();
+      }
+    },[StateData, State])
+
+    const handleBack = () => {
+      dispatch(showHeader());
+      navigation.goBack();
+    }
+
     return (
         <Container>
             <StatusBar barStyle="dark-content" backgroundColor="#e3f2f0" />
             <View style={Styles.setbgcolorthe}>
                 <View style={Style.setheaderspacepadding}>
-                    {/* <AppHeader leftImage={images.back_image} title='Edit' onLeftPress={() => navigation.goBack()} /> */}
+                    <AppHeader leftImage={images.back_image} title='Edit' onLeftPress={handleBack} />
                 </View>
                 <ScrollView
                     contentContainerStyle={{

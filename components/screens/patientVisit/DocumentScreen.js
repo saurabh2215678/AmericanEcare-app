@@ -171,7 +171,7 @@ useEffect(() => {
     
   return (
 
-      <Container>
+      <View style={{backgroundColor: "#e3f2f0", height:"100%"}}>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
             <ImageBackground source={images.full_bg_img_hospital} resizeMode='cover'>
                 <View style={Style.setheaderspacepadding}>
@@ -248,7 +248,7 @@ useEffect(() => {
             </ImageBackground>
 
              
-        </Container>
+        </View>
   );
 };
 

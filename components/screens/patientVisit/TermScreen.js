@@ -114,7 +114,7 @@ useEffect(() => {
     
   return (
 
-  	  <Container>
+  	  <View style={{backgroundColor: "#e3f2f0", height:"100%"}}>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
            
                 <View style={Style.setheaderspacepadding}>
@@ -180,7 +180,7 @@ useEffect(() => {
             
 
              
-        </Container>
+        </View>
   );
 };
 

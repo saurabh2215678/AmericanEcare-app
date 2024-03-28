@@ -10,6 +10,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 //import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+import { Card } from 'react-native-paper';
 
 
 const MedicationScreen = ({route,navigation}) => {
@@ -283,7 +284,8 @@ useEffect(() => {
     
   return (
 
-  	 <Container>
+  	 <Container  style={styles.fullContainer}>
+          <SafeAreaView>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
           
                 <View style={Style.setheaderspacepadding}>
@@ -293,8 +295,8 @@ useEffect(() => {
                         onLeftPress={() => navigation.navigate('MedicalHistoryScreen',{request_type: request_type})} />
                 </View>
                
-          <SafeAreaView>
-              <View>
+          
+             
                 <Modal
                   animationType={'slide'}
                   transparent={false}
@@ -395,48 +397,53 @@ useEffect(() => {
                   </View>
                 </Modal>
                 {/*Updating the state to make Modal Visible*/}
-                <Button
-                  title="Add Medication"
-                  onPress={() => {
-                    setShowModal(!showModal);
-                  }}
-                />
+                <View style={styles.btnWrapper}>
+                  <View style={styles.btnInner}>
+                    <Button
+                      style={styles.buttonStyle}
+                      buttonTextStyle={styles.buttonTextStyle}
+                      title="Add Medication"
+                      onPress={() => {
+                        setShowModal(!showModal);
+                      }}
+                    />
+                  </View>
+                  <View style={styles.btnInner}>
+                    <Button
+                      style={styles.buttonStyle}
+                      buttonTextStyle={styles.buttonTextStyle}
+                      title="Skip and Next"
+                      onPress={() => {
+                        navigation.navigate("AllergyScreen",{
+                              request_type: request_type,
+                          });
+                      }}
+                    />
+                  </View>
+                </View>
+                
+                 
+              
 
-                 <Text style={styles.text}></Text>
-
-                 <Button
-                  title="Skip and Next"
-                  onPress={() => {
-                    navigation.navigate("AllergyScreen",{
-                          request_type: request_type,
-                      });
-                  }}
-                />
-
-
-
-              </View>
-
-            </SafeAreaView>
-        
-
-          <SafeAreaView style={styles.container}>
+           
                     <FlatList
+                      style={styles.flatListStyle}
                       data={pastMedicationApi}
                       renderItem={({item}) =>  (
+                        <Card style={styles.cardStyle}>
                         <View style={styles.listitems}>
-                        <Text> 
-                         Drug: {item.drugs_name} {"\n"}
-                         Strength: {item.strength}{"\n"}
-                        </Text> 
-                                  <TouchableOpacity onPress={()=>delete_past_medication_confirm(item.id)}>
-                                  <View style={styles.button_two}>
-                                    <Text style={styles.buttonTextStyle}>Delete</Text>
-                                  </View>
-                                </TouchableOpacity>
-                                
-
-                      </View> )
+                          <Text> 
+                          Drug: {item.drugs_name} {"\n"}
+                          Strength: {item.strength}{"\n"}
+                          </Text> 
+                                    <TouchableOpacity onPress={()=>delete_past_medication_confirm(item.id)}>
+                                    <View style={styles.button_two}>
+                                      <Text style={styles.deleteTextStyle}>Delete</Text>
+                                    </View>
+                                  </TouchableOpacity>
+                        </View>
+                        </Card>
+                         )
                       }
                        refreshControl={
                         <RefreshControl
@@ -456,8 +463,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  container:{
+    backgroundColor: "red",
+  },
+  flatListStyle:{
+    backgroundColor: "#e3f2f0",
+    height: "100%"
+  },
+  fullContainer:{
+    backgroundColor: "blue",
+    flex: 1,
+  },
   title: {
     fontSize: 32,
+  },
+  cardStyle:{
+    marginHorizontal: 10,
+    marginVertical: 6,
+    backgroundColor: "#fff"
+  },
+  btnWrapper: {
+    backgroundColor :  "#e3f2f0",
+    flexDirection : "row",
+    justifyContent: "space-between",
+    padding: 10
+  },
+  btnInner:{
+    width: '48%'
   },
   buttonStyle: {
     height: 54,
@@ -476,6 +508,10 @@ const styles = StyleSheet.create({
     },
   },
   buttonTextStyle: {
+    fontSize: 15,
+    fontWeight: '400',
+  },
+  deleteTextStyle: {
     color: 'red',
     fontWeight: '700',
   },
@@ -532,8 +568,6 @@ dropdown: {
   listitems: {
     width: "100%",
     flex:1,
-    marginTop: 5,
-    backgroundColor: "#eee",
     padding: 10,
     flexDirection: 'row',
     justifyContent:'space-between'
@@ -543,5 +577,4 @@ button_two: {
     alignItems: 'flex-end',
 }
 });
-
 export default MedicationScreen;

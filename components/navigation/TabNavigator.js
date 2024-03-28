@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -15,6 +15,8 @@ import CustomSidebarMenu  from '../screens/CustomSidebarMenu';
 
 import { createDrawerNavigator, DrawerContentScrollView,
   DrawerItemList,DrawerItem} from '@react-navigation/drawer';
+import { useDispatch } from "react-redux";
+import { showHeader } from "../store/headerSlice";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -34,6 +36,10 @@ return (
 
 
 const HomeTabNavigator = () => {
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    dispatch(showHeader());
+  },[]);
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

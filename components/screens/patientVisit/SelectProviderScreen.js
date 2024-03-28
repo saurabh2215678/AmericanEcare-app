@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import {View, Text, StyleSheet,StatusBar,ScrollView, Pressable,ImageBackground} from 'react-native';
+import {View, Text, StyleSheet,StatusBar,ScrollView, Pressable,ImageBackground, BackHandler} from 'react-native';
 import {Container,AppHeader,Input,Button} from '../components';
 import Styles from '../styles/LoginRegiesterStyle/RegisterScreenStyle';
 import Style from '../styles/CommonStyle/Style';
@@ -82,6 +82,8 @@ const getCSRFToken = async () => {
     throw error;
   }
 };
+
+
 
 const available_doctors_by_visit_type=  (visitType)=>{
 //const csrfToken =  getCSRFToken();  

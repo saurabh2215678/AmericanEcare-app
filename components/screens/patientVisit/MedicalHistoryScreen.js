@@ -10,6 +10,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 //import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+import { Card } from 'react-native-paper';
 
 
 const MedicalHistoryScreen = ({route,navigation}) => {
@@ -244,8 +245,9 @@ useEffect(() => {
     
   return (
 
-  	 <Container>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+  	 <Container style={styles.fullContainer}>
+          <SafeAreaView>
+              <StatusBar barStyle="dark-content" backgroundColor="#fff" />
           
                 <View style={Style.setheaderspacepadding}>
                    <AppHeader
@@ -254,9 +256,68 @@ useEffect(() => {
                         onLeftPress={() => backPress()} />
                 </View>
                
-          <SafeAreaView>
-              <View style={styles.container}>
-                <Modal
+           
+                
+                {/*Updating the state to make Modal Visible*/}
+                <View style={styles.btnWrapper}>
+                  <View style={styles.btnInner}>
+                    <Button
+                    style={styles.buttonStyle}
+                    buttonTextStyle={styles.buttonTextStyle}
+                      title="Add Medical History"
+                      onPress={() => {
+                        setShowModal(!showModal);
+                      }}
+                    />
+                  </View>
+
+                  <View style={styles.btnInner}>
+                    <Button
+                    style={styles.buttonStyle}
+                    buttonTextStyle={styles.buttonTextStyle}
+                      title="Skip and Next"
+                      onPress={() => {
+                        navigation.navigate("MedicationScreen",{
+                          request_type: request_type,
+                        });
+                      }}
+                    />
+                  </View>
+                </View>
+
+
+
+
+
+                    <FlatList
+                    style={styles.flatListStyle}
+                      data={pastMedicalHistoryApi}
+                      renderItem={({item}) =>  (
+                        <Card style={styles.cardStyle}>
+                          <View style={styles.listitems}>
+                          <Text> 
+                          Diease: {item.illness} {"\n"}
+                          Onset Age: {item.onset_age}{"\n"}
+                          Comment: {item.comment}{"\n"}
+                          </Text> 
+                                    <TouchableOpacity onPress={()=>delete_past_medical_history_confirm(item.id)}>
+                                    <View style={styles.button_two}>
+                                      <Text style={styles.deleteTextStyle}>Delete</Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                  
+
+                        </View> 
+                      </Card>)
+                      }
+                       refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                      }/>
+              </SafeAreaView>
+              <Modal
                   animationType={'slide'}
                   transparent={false}
                   visible={showModal}
@@ -325,58 +386,6 @@ useEffect(() => {
                     />
                   </View>
                 </Modal>
-                {/*Updating the state to make Modal Visible*/}
-                <Button
-                  title="Add Medical History"
-                  onPress={() => {
-                    setShowModal(!showModal);
-                  }}
-                />
-
-                 <Text style={styles.text}></Text>
-
-                 <Button
-                  title="Skip and Next"
-                  onPress={() => {
-                    navigation.navigate("MedicationScreen",{
-                      request_type: request_type,
-                    });
-                  }}
-                />
-
-
-
-              </View>
-
-            </SafeAreaView>
-        
-
-          <SafeAreaView style={styles.container}>
-                    <FlatList
-                      data={pastMedicalHistoryApi}
-                      renderItem={({item}) =>  (
-                        <View style={styles.listitems}>
-                        <Text> 
-                         Diease: {item.illness} {"\n"}
-                         Onset Age: {item.onset_age}{"\n"}
-                         Comment: {item.comment}{"\n"}
-                        </Text> 
-                                  <TouchableOpacity onPress={()=>delete_past_medical_history_confirm(item.id)}>
-                                  <View style={styles.button_two}>
-                                    <Text style={styles.buttonTextStyle}>Delete</Text>
-                                  </View>
-                                </TouchableOpacity>
-                                
-
-                      </View> )
-                      }
-                       refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                        />
-                      }/>
-              </SafeAreaView>
         </Container>
   );
 };
@@ -388,8 +397,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  container:{
+    backgroundColor: "red",
+  },
+  flatListStyle:{
+    backgroundColor: "#e3f2f0",
+    height: "100%"
+  },
+  fullContainer:{
+    backgroundColor: "blue",
+    flex: 1,
+  },
   title: {
     fontSize: 32,
+  },
+  cardStyle:{
+    marginHorizontal: 10,
+    marginVertical: 6,
+    backgroundColor: "#fff"
+  },
+  btnWrapper: {
+    backgroundColor :  "#e3f2f0",
+    flexDirection : "row",
+    justifyContent: "space-between",
+    padding: 10
+  },
+  btnInner:{
+    width: '48%'
   },
   buttonStyle: {
     height: 54,
@@ -408,6 +442,10 @@ const styles = StyleSheet.create({
     },
   },
   buttonTextStyle: {
+    fontSize: 15,
+    fontWeight: '400',
+  },
+  deleteTextStyle: {
     color: 'red',
     fontWeight: '700',
   },
@@ -464,8 +502,6 @@ dropdown: {
   listitems: {
     width: "100%",
     flex:1,
-    marginTop: 5,
-    backgroundColor: "#eee",
     padding: 10,
     flexDirection: 'row',
     justifyContent:'space-between'

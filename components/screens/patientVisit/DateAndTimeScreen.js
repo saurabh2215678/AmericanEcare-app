@@ -11,7 +11,14 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import { Card,RadioButton } from 'react-native-paper';
+import { useDispatch } from 'react-redux';
+import { hideHeader, showHeader } from '../../store/headerSlice';
+import { BackHandler } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 const DateAndTimeScreen = ({navigation}) => {
+  const dispatch = useDispatch();
   const API_URL = Strings.baseUrl.url;
    const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -25,6 +32,7 @@ const DateAndTimeScreen = ({navigation}) => {
     const [isFocus, setIsFocus] = useState(false);
     const [patientId, setpatientId] = useState("");
     const [dependentApi, setdependentApi] = useState([]);
+    const [dependentLoading, setDependentLoading] = useState(false);
 
     const [isChecked1, setChecked1] = useState(false);
 
@@ -61,6 +69,13 @@ useEffect(() => {
 
 }, [patientId]);
 
+
+useEffect(()=>{
+  dispatch(hideHeader());
+},[]);
+
+
+
   // Function to get CSRF token from the server
 const getCSRFToken = async () => {
   try {
@@ -76,6 +91,7 @@ const getCSRFToken = async () => {
 
  const getPatientDependent =  () => {
     //const csrfToken = await getCSRFToken();
+    setDependentLoading(true);
 
     // Function to get the value from AsyncStorage
          let axiosConfig = {
@@ -102,9 +118,12 @@ const getCSRFToken = async () => {
                // setCityData(cityArray);  
                //console.log(dependentArray); 
                setdependentApi(dependentArray);
-
+               setDependentLoading(false);
                 })
-             .catch(err => console.log('Patient Dependent API: ', err));
+             .catch(err => {
+              console.log('Patient Dependent API: ', err);
+              setDependentLoading(false);
+            });
         };
 
 
@@ -221,6 +240,10 @@ const getCurrentDateTime=()=>{
       setcurrentDate(current_date);
       setcurrentTime(time);
 }
+const handleBack = () =>{
+  dispatch(showHeader());
+  navigation.navigate(navigation_url)
+}
 
 const height = "flexDirection: 'column',justifyContent: 'flex-start',alignContent: 'flex-start',height: '100%'"
    
@@ -233,7 +256,7 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                     <AppHeader
                         leftImage={images.back_image}
                         title="Start visit Now"
-                        onLeftPress={() => navigation.navigate(navigation_url)} />
+                        onLeftPress={handleBack} />
                 </View>
                 <ScrollView
                     contentContainerStyle={{
@@ -299,10 +322,12 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
             </ImageBackground>
 
               <SafeAreaView style={styles.container}>
-                    <FlatList
+                {dependentLoading && <View style={loadingContainerStyle}><ActivityIndicator size="large" color="#33BAD8" /></View>}
+                    {!dependentLoading && <FlatList
                       data={dependentApi}
                       renderItem={({item}) =>  (
-                       <View style={styles.listitems}>
+                       <Card style={styles.cardStyle}>
+                        <View style={styles.listitems}>
                           <Text>
                              Name: {item.dependent_first_name} {"\n"}
                              DOB: {item.dependent_dob}{"\n"}
@@ -313,12 +338,14 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                          
                           <TouchableOpacity onPress={()=>delete_dependent_box(item.id)}>
                             <View style={styles.button_two}>
-                              <Text style={styles.buttonTextStyle}>Delete</Text>
+                              {/* <Text style={styles.buttonTextStyle}></Text> */}
+                              <Icon name="trash" size={20} color="red" />
                             </View>
                           </TouchableOpacity>
-                        </View>)
+                        </View>
+                        </Card>)
                       }
-                    />
+                    />}
               </SafeAreaView>
         </Container>
 
@@ -329,6 +356,9 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
   );
 };
 
+const loadingContainerStyle = {
+ marginTop: 50
+}
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
@@ -409,15 +439,17 @@ Zonedropdown: {
     color: "#FFF",
     fontSize: 12
   },
-
-  listitems: {
-    width: "100%",
+  cardStyle:{
     flex:1,
-    marginTop: 5,
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
     padding: 10,
+   
+    margin: 10
+  },
+  listitems: {
+    // width: "100%",
     flexDirection: 'row',
-    justifyContent:'space-between'
+    justifyContent:'space-between',
 },
 button_two: {
     width: "100%",

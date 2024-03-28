@@ -67,7 +67,7 @@ const get_symtoms_with_subsymtoms = async ()=>{
      try {
       
          const SymptomsData = JSON.parse(await AsyncStorage.getItem('SymptomsData')) ;
-        
+        // console.log('ssdd ==', SymptomsData);
         if (SymptomsData !== null) {
           setData(SymptomsData);
          

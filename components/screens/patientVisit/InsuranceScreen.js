@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 
 const InsuranceScreen = ({route,navigation}) => {
-  console.log('r')
+
     const API_URL = Strings.baseUrl.url;
    
     const [DisplayAlert, setDisplayAlert] = useState(0)
@@ -62,6 +62,7 @@ const InsuranceScreen = ({route,navigation}) => {
   AsyncStorage.setItem("rxpcn", rx_pcn);
   AsyncStorage.setItem("rxgrp", rx_grp);
   
+  // navigation.navigate("TermScreen",{request_type: request_type});
   navigation.navigate("TermScreen",{request_type: request_type});
 }
 
