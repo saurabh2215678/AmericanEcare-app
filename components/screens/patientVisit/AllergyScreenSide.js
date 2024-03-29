@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 
 
-const AllergyScreen = () => {
+const AllergyScreenSide = () => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [allergyList, setAllergyList] = useState([]);
@@ -352,7 +352,7 @@ const AllergyScreen = () => {
     </Container>
   )
 }
-export default AllergyScreen;
+export default AllergyScreenSide;
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const loadingtext ={fontSize:18, fontWeight:500, textAlign:'center' }

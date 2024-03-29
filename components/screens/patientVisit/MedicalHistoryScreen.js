@@ -237,10 +237,13 @@ const backPress=()=>{
 
 
 useEffect(() => {
-  getPatientId();
   getDieases();
   getPatienPastMedicalHistory();
 }, [patientId]);
+
+useEffect(() => {
+  getPatientId();
+}, []);
 
     
   return (

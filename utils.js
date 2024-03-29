@@ -46,7 +46,7 @@ export const SideBarData = [
             {
                 name: 'Insurance',
                 icon: 'universal-access',
-                navigateTo: 'InsuranceScreen'
+                navigateTo: 'InsuranceScreenSide'
             },
             {
                 name: 'Pharmacy',
@@ -62,12 +62,12 @@ export const SideBarData = [
             // {
             //     name: 'Medication',
             //     icon: 'leaf',
-            //     navigateTo: 'MedicationScreen'
+            //     navigateTo: 'MedicationScreenSide'
             // },
             // {
             //     name: 'Allergy',
             //     icon: 'forumbee',
-            //     navigateTo: 'AllergyScreen'
+            //     navigateTo: 'AllergyScreenSide'
             // },
             {
                 name: 'Diagnosis',
@@ -77,7 +77,7 @@ export const SideBarData = [
             {
                 name: 'Past Medical History',
                 icon: 'medium',
-                navigateTo: 'MedicalHistoryScreen'
+                navigateTo: 'MedicalHistoryScreenSide'
             },
             {
                 name: 'Past Surgery Histroy',

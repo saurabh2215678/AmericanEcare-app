@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import {View, Text, StyleSheet,StatusBar,ScrollView,SafeAreaView, Pressable,ImageBackground,Image,FlatList,  TouchableOpacity,Alert } from 'react-native';
+import {View, Text, StyleSheet,StatusBar,ScrollView,SafeAreaView, Pressable,ImageBackground,Image,FlatList,  TouchableOpacity,Alert, ActivityIndicator, TextInput } from 'react-native';
 import {Container,AppHeader,Input,Button} from '../components';
 import Styles from '../styles/LoginRegiesterStyle/RegisterScreenStyle';
 import Style from '../styles/CommonStyle/Style';
@@ -13,6 +13,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import axios from 'axios';
 import IconG from 'react-native-vector-icons/Ionicons';
 import { Card,RadioButton } from 'react-native-paper';
+import { useDispatch } from 'react-redux';
+import { showHeader } from '../../store/headerSlice';
 const ScheduleScreen = ({navigation}) => {
   const API_URL = Strings.baseUrl.url;
    const [currentPassword, setCurrentPassword] = useState('');
@@ -35,6 +37,8 @@ const ScheduleScreen = ({navigation}) => {
     const [datePickerVisible, setDatePickerVisible] = useState(false);
     const [timeData, setTimeData] = useState([]);
     const [timeval, setTimeval] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
 
      const showDatePicker = () => {
       setDatePickerVisible(true);
@@ -162,16 +166,20 @@ useEffect(() => {
      setTimeData(DATA)
 
      getCurrentDateTime();
-     getPatientId();
+    //  getPatientId();
      getPatientDependent();
    // alert(patientId)
      //alert(Dependent);
 
 }, [patientId]);
+useEffect(() => {
+     getPatientId();
+}, []);
 
 
  const getPatientDependent = () => {
     // Function to get the value from AsyncStorage
+    setLoading(true);
          let axiosConfig = {
               headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
@@ -195,8 +203,8 @@ useEffect(() => {
                // setCityData(cityArray);  
                //console.log(dependentArray); 
                setdependentApi(dependentArray);
-
-                })
+               setLoading(false);
+              })
              .catch(err => console.log('Dependent API (Schedule Screen): ', err));
         };
 
@@ -324,7 +332,11 @@ const getCurrentDateTime=()=>{
 }
 
 const height = "flexDirection: 'column',justifyContent: 'flex-start',alignContent: 'flex-start',height: '100%'"
-   
+const handleBack = () =>{
+  dispatch(showHeader());
+  navigation.navigate(navigation_url)
+}
+
   return (
 
   	 <Container>
@@ -334,7 +346,7 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                     <AppHeader
                         leftImage={images.back_image}
                         title="Schedule Visit"
-                        onLeftPress={() => navigation.navigate(navigation_url)} />
+                        onLeftPress={handleBack} />
                 </View>
                 <ScrollView
                     contentContainerStyle={{
@@ -346,19 +358,19 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                     <View style={Styles.container}>
                         <View style={Style.minviewallcontent}>
 
-                            <Text style={Styles.lableTextStyle}>Date</Text>
+                            <Text style={styles.lableTextStyle}>Date</Text>
                            
                        
-                             <Input
+                             <TextInput
                                 placeholder="Appointment Date"
                                 onChangeText={(visitDate) => setvisitDate(visitDate)}
                                 value={selectedDate ? selectedDate.toLocaleDateString() : 'No date selected'}
-                                inputStyle={Style.inputMobile}
+                                style={Style.inputMobile}
                             />
                         
                     
-              <TouchableOpacity onPress={()=>showDatePicker()}>
-                <Text style={styles.buttonTextStyle}>Open Calender</Text>
+              <TouchableOpacity onPress={()=>showDatePicker()} style={{width: "100%", marginBottom: 10}}>
+                <Text style={styles.CalenderButton}>Open Calender</Text>
              
             </TouchableOpacity>
 
@@ -372,7 +384,7 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                           />
 
 
-                           <Text style={Styles.lableTextStyle}>Time</Text>
+                           <Text style={styles.lableTextStyle}>Time</Text>
                          <View style={Styles.inputviewstyle}>
                                
                             <Dropdown
@@ -400,7 +412,7 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                             </View>
 
 
-                     <Text style={Styles.lableTextStyle}>Select self or dependent</Text>
+                     <Text style={styles.lableTextStyle}>Select self or dependent</Text>
                          <View style={Styles.inputviewstyle}>
                                
                             <Dropdown
@@ -440,26 +452,33 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
             </ImageBackground>
 
               <SafeAreaView style={styles.container}>
+                <View style={{backgroundColor: '#e3f2f0', flexGrow: 1, height: "100%"}}>
+                {loading &&  <ActivityIndicator size="large" color="#33BAD8" />}
+                {!loading &&
                     <FlatList
                       data={dependentApi}
                       renderItem={({item}) =>  (
-                       <View style={styles.listitems}>
-                          <Text>
-                             Name: {item.dependent_first_name} {"\n"}
-                             DOB: {item.dependent_dob}{"\n"}
-                             Relation: {item.dependent_relationship}{"\n"}
-                          </Text>
+                        <Card style={{marginHorizontal: 8, marginBottom: 8}}>
+                        <View style={styles.listitems}>
+                            <Text>
+                              Name: {item.dependent_first_name} {"\n"}
+                              DOB: {item.dependent_dob}{"\n"}
+                              Relation: {item.dependent_relationship}{"\n"}
+                            </Text>
 
-                         <TouchableOpacity onPress={()=>choose_dependent(item.id)}><Text>Choose this</Text></TouchableOpacity>
-                         
-                          <TouchableOpacity onPress={()=>delete_dependent_box(item.id)}>
-                            <View style={styles.button_two}>
-                              <Text style={styles.buttonTextStyle}>Delete</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>)
+                          <TouchableOpacity onPress={()=>choose_dependent(item.id)}><Text>Choose this</Text></TouchableOpacity>
+                          
+                            <TouchableOpacity onPress={()=>delete_dependent_box(item.id)}>
+                              <View style={styles.button_two}>
+                                <Text style={styles.buttonTextStyle}>Delete</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Card>)
                       }
                     />
+                }
+                </View> 
               </SafeAreaView>
         </Container>
 
@@ -479,6 +498,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+  },
+  lableTextStyle:{
+    width: "100%"
+  },
+  CalenderButton:{
+    backgroundColor : "#fff",
+    width: '100%',
+    lineHeight: 40,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    borderColor: "#e9e9e9",
+    borderWidth: 1
   },
   buttonStyle: {
     height: 54,
@@ -555,7 +586,7 @@ Zonedropdown: {
     width: "100%",
     flex:1,
     marginTop: 5,
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
     padding: 10,
     flexDirection: 'row',
     justifyContent:'space-between'

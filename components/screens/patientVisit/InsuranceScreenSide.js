@@ -6,7 +6,7 @@ import { HitApi } from "../../../utils";
 import Toast from "react-native-toast-message";
 import { ActivityIndicator } from "react-native";
 
-const InsuranceScreen = ()=>{
+const InsuranceScreenSide = ()=>{
 
   const [formData, setFormData] = useState({});
   const [submitted, setsubmitted] = useState(false);
@@ -149,4 +149,4 @@ const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
 const formoverlay = {position:"absolute", top: 15, left: 0, width:"100%", height: "100%", backgroundColor:"#fff9", zIndex: 9, flex: 1, alignItems: "center", justifyContent: "center"}
 const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 
-export default InsuranceScreen;
+export default InsuranceScreenSide;

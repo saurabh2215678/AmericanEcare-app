@@ -33,10 +33,12 @@ export default function DashboardScreen({ navigation }) {
    }
 
    const scheduleVisitNow = () => {
+    dispatch(hideHeader())
       navigation.navigate("ScheduleScreen")
    }
 
    const MyVisitScreen = () => {
+    dispatch(hideHeader())
       navigation.navigate("MyVisitScreen")
    }
 

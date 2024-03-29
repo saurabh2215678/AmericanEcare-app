@@ -23,10 +23,12 @@ import { Container,AppHeader } from './components';
 import { SH, Strings } from './utils';
 import Style from './styles/CommonStyle/Style';
 import axios from 'axios';
+import { useDispatch } from "react-redux";
+import { showHeader } from "../store/headerSlice";
 
 export default function MyVisitScreen({ navigation }) {
  
-
+  const dispatch = useDispatch();
  const colorrdata  = '#013220';
  const API_URL = Strings.baseUrl.url;
  const [patientId, setpatientId] = useState("");
@@ -77,9 +79,9 @@ useEffect(() => {
                 <View style={Styles.setwhitebox}>
                     <View style={Styles.flexrowsetimage}>
                        
-                        <View style={Styles.imagecenterstyleset}>
+                        <View style={{width: '100%'}}>
                             <Text  style={[Styles.textsetdoctore,{color:colorrdata}]}>{item.reason}</Text>
-                            <View style={Styles.setwidth}>
+                            <View style={styles.setwidth}>
                                 <Text style={Styles.textsetdoctoretwo}>{item.date_time}</Text>
                                 <Text style={Styles.textsetdoctoretwo}>{item.expireddate} <Text style={Styles.blackcolorsettext}>{item.accepted} {item.accepted=='Accepted' ? '('+item.doctor_name+')' : ''}</Text></Text>
                             </View>
@@ -95,12 +97,17 @@ useEffect(() => {
             </TouchableOpacity>
         );
     }
+
+    const handleBack = () =>{
+      dispatch(showHeader());
+      navigation.navigate('DashboardScreen')
+    }
     return (
         <Container>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
          <ImageBackground source={images.full_bg_img_hospital} resizeMode='cover'>
           <View style={Style.setheaderspacepadding}>
-            <AppHeader leftImage={images.back_image} title={"My Visit Details"} onLeftPress={() => navigation.navigate('DashboardScreen')} />
+            <AppHeader leftImage={images.back_image} title={"My Visit Details"} onLeftPress={handleBack} />
           </View>
             <View style={Styles.minstyleviewphotograpgy}>
                 
@@ -139,7 +146,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 20
   },
-
+  setwidth: {
+    width:'100%',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    paddingRight:17,
+  },
    cardstyle: {
      backgroundColor: '#fff',
   },

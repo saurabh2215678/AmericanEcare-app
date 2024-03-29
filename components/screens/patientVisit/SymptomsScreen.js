@@ -152,7 +152,7 @@ useEffect(() => {
 
                  
 
-                <ScrollView>
+                <ScrollView style={{backgroundColor:"#e3f2f0", height: "100%"}}>
                     <View style={Styles.container_custom}>
 
                      <Spinner

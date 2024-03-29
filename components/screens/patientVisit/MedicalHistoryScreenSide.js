@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { ActivityIndicator } from "react-native";
 
 
-const MedicalHistoryScreen = () => {
+const MedicalHistoryScreenSide = () => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [selectBox, setselectBox] = useState();
@@ -257,7 +257,7 @@ const MedicalHistoryScreen = () => {
     </Container>
   )
 }
-export default MedicalHistoryScreen;
+export default MedicalHistoryScreenSide;
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};
 const saperator = {backgroundColor: '#fff', padding: 10};

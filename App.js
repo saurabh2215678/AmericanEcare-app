@@ -46,6 +46,10 @@ import PaymentScreen from "./components/screens/patientVisit/PaymentScreen";
 import CardScreen from "./components/screens/patientVisit/CardScreen";
 import ThankyouScreen from "./components/screens/patientVisit/ThankyouScreen";
 import ChangePasswordScreen from "./components/screens/ChangePasswordScreen";
+import InsuranceScreenSide from "./components/screens/patientVisit/InsuranceScreenSide";
+import MedicalHistoryScreenSide from "./components/screens/patientVisit/MedicalHistoryScreenSide";
+import MedicationScreenSide from "./components/screens/patientVisit/MedicationScreenSide";
+import AllergyScreenSide from "./components/screens/patientVisit/AllergyScreenSide";
 const Drawer = createDrawerNavigator();
 
 
@@ -60,16 +64,20 @@ const NewDrawerNavigator = ({header}) => {
         <Drawer.Screen name="DependentScreen" component={DependentScreen} />
         <Drawer.Screen name="ImmunizationScreen" component={ImmunizationScreen} />
         <Drawer.Screen name="InsuranceScreen" component={InsuranceScreen} />
+        <Drawer.Screen name="InsuranceScreenSide" component={InsuranceScreenSide} />
         <Drawer.Screen name="Home" component={HomeTabNavigator} />
         <Drawer.Screen name="DateAndTimeScreen" component={DateAndTimeScreen} />
         <Drawer.Screen name="ScheduleScreen" component={ScheduleScreen} />
         <Drawer.Screen name="MyVisitScreen" component={MyVisitScreen} />
         <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
         <Drawer.Screen name="MedicationScreen" component={MedicationScreen} />
+        <Drawer.Screen name="MedicationScreenSide" component={MedicationScreenSide} />
         <Drawer.Screen name="AllergyScreen" component={AllergyScreen} />
+        <Drawer.Screen name="AllergyScreenSide" component={AllergyScreenSide} />
         <Drawer.Screen name="PastSurgeryScreen" component={PastSurgeryScreen} />
         <Drawer.Screen name="DiagnosisScreen" component={DiagnosisScreen} />
         <Drawer.Screen name="MedicalHistoryScreen" component={MedicalHistoryScreen} />
+        <Drawer.Screen name="MedicalHistoryScreenSide" component={MedicalHistoryScreenSide} />
         <Drawer.Screen name="PatientSocialHistory" component={PatientSocialHistory} />
         <Drawer.Screen name="ObgynHistory" component={ObgynHistory} />
         <Drawer.Screen name="FamilyHistory" component={FamilyHistory} />

@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import {View, Text, StyleSheet,StatusBar,ScrollView,SafeAreaView, Pressable,ImageBackground,Image,FlatList,  TouchableOpacity,Alert } from 'react-native';
+import {View, Text, StyleSheet,StatusBar,ScrollView,SafeAreaView, Pressable,ImageBackground,Image,FlatList,  TouchableOpacity,Alert, TextInput } from 'react-native';
 import {Container,AppHeader,Input,Button} from '../components';
 import Styles from '../styles/LoginRegiesterStyle/RegisterScreenStyle';
 import Style from '../styles/CommonStyle/Style';
@@ -268,21 +268,21 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                     <View style={Styles.container}>
                         <View style={Style.minviewallcontent}>
 
-                            <Text style={Styles.lableTextStyle}>Date</Text>
-                            <Input
+                            <Text style={styles.lableTextStyle}>Date</Text>
+                            <TextInput
                                 placeholder="Date"
                                 onChangeText={(text) => onChangeText(text, 'currentPassword')}
                                 value={currentDate}
-                                inputStyle={Style.inputMobile}
+                                style={Style.inputMobile}
                             />
-                            <Text style={Styles.lableTextStyle}>Time</Text>
-                            <Input
+                            <Text style={styles.lableTextStyle}>Time</Text>
+                            <TextInput
                                 placeholder="Time"
                                 onChangeText={(text) => onChangeText(text, 'newPassword')}
                                 value={currentTime}
-                                inputStyle={Style.inputMobile}
+                                style={Style.inputMobile}
                             />
-                             <Text style={Styles.lableTextStyle}>Select self or dependent</Text>
+                             <Text style={styles.lableTextStyle}>Select self or dependent</Text>
         <View style={Styles.inputviewstyle}>
                                
                 <Dropdown
@@ -322,6 +322,7 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
             </ImageBackground>
 
               <SafeAreaView style={styles.container}>
+              <View style={{backgroundColor: '#e3f2f0', flexGrow: 1, height: "100%"}}>
                 {dependentLoading && <View style={loadingContainerStyle}><ActivityIndicator size="large" color="#33BAD8" /></View>}
                     {!dependentLoading && <FlatList
                       data={dependentApi}
@@ -346,6 +347,7 @@ const height = "flexDirection: 'column',justifyContent: 'flex-start',alignConten
                         </Card>)
                       }
                     />}
+                    </View>
               </SafeAreaView>
         </Container>
 
@@ -368,6 +370,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+  },
+  lableTextStyle:{
+    width: "100%"
   },
   buttonStyle: {
     height: 54,

@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 
 
-const MedicationScreen = () => {
+const MedicationScreenSide = () => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [medicationList, setMedicationList] = useState([]);
@@ -208,7 +208,7 @@ const MedicationScreen = () => {
         </TouchableOpacity>
 
         <View>
-        aa
+        
           {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
           {medicationList.map((item, index)=><MedicationItem key={index} data={item} deleteMedication={deleteMedication} deleting={deleting}/>)}
         </View>
@@ -325,7 +325,7 @@ const MedicationScreen = () => {
     </Container>
   )
 }
-export default MedicationScreen;
+export default MedicationScreenSide;
 
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
 const buttonTextStyle = {color: '#fff', fontSize: 14};

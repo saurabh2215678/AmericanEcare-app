@@ -224,7 +224,7 @@ useEffect(() => {
                     <View style={Styles.container}>
                         <View style={Style.minviewallcontent}>
 
-                             <Text style={Styles.lableTextStyle}>Select Provider</Text>
+                             <Text style={styles.lableTextStyle}>Select Provider</Text>
                              <View style={Styles.inputviewstyle}>
                                
                                   <Dropdown
@@ -253,7 +253,7 @@ useEffect(() => {
                             </View>
 
 
-                            <Text style={Styles.lableTextStyle}>Select Visit Types</Text>
+                            <Text style={styles.lableTextStyle}>Select Visit Types</Text>
                              <View style={Styles.inputviewstyle}>
                               <Dropdown
                                style={[styles.Zonedropdown, isFocus && { borderColor: 'blue' }]}
@@ -281,7 +281,7 @@ useEffect(() => {
                             </View>
 
 
-                             <Text style={Styles.lableTextStyle}>Available Providers</Text>
+                             <Text style={styles.lableTextStyle}>Available Providers</Text>
                              <View style={Styles.inputviewstyle}>
                               <Dropdown
                                style={[styles.Zonedropdown, isFocus && { borderColor: 'blue' }]}
@@ -350,6 +350,9 @@ const styles = StyleSheet.create({
   buttonTextStyle: {
     color: '#fdfdfd',
     fontWeight: '700',
+  },
+  lableTextStyle:{
+    width: "100%"
   },
 Zonedropdown: {
       height: 40,

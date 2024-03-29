@@ -140,12 +140,12 @@ useEffect(() => {
                     <View style={Styles.container}>
                         <View style={Style.minviewallcontent}>
 
-                        <Text style={Styles.lableTextStyle}>Reason of the visit</Text>
-                            <Input
+                        <Text style={styles.lableTextStyle}>Reason of the visit</Text>
+                            <TextInput
                                 placeholder="Reason"
                                 onChangeText={(reason) => setReason(reason)}
                                 value={reason}
-                                inputStyle={Style.inputMobile}
+                                style={Style.inputMobile}
                             />
 
                         <Text style={styles.symptomsText}>Duration of symptoms</Text>   
@@ -258,6 +258,9 @@ const styles = StyleSheet.create({
     color: '#fdfdfd',
     fontWeight: '700',
   },
+  lableTextStyle:{
+    width: "100%"
+  },
 Zonedropdown: {
       height: 40,
       borderColor: 'grey',
@@ -271,6 +274,7 @@ Zonedropdown: {
 
     },
     symptomsText:{
+      width: '100%',
        fontSize: 18,
        marginBottom: 15,
        color:'#152549',

@@ -102,7 +102,6 @@ const Symptoms = ({ data }) => {
 
   return (
     <View style={{ margin: 50 }}>
-      {console.log('listData ==', listData)}
       {listData.map((item, index) => <SymptomItem key={index} category={item.name} subheadings={item.data} isChecked={isChecked} setChecked={setChecked}/>)}
       {/* <FlatList
         data={[data]}
