@@ -135,7 +135,7 @@ const getCSRFToken = async () => {
 
     if(Dependent != 0)
     {
-        navigation.navigate("DependentScreen",{
+        navigation.navigate("DependentScreenSide",{
           dependent_val: Dependent,
         });
     }

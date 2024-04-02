@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { NavigationContainer, createNavigationContainerRef } from "@react-navigation/native";
+import { NavigationContainer, createNavigationContainerRef, useNavigation } from "@react-navigation/native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import StackNavigator from "./components/navigation/StackNavigator";
 import DrawerNavigator from "./components/navigation/StackNavigator";
@@ -50,18 +50,42 @@ import InsuranceScreenSide from "./components/screens/patientVisit/InsuranceScre
 import MedicalHistoryScreenSide from "./components/screens/patientVisit/MedicalHistoryScreenSide";
 import MedicationScreenSide from "./components/screens/patientVisit/MedicationScreenSide";
 import AllergyScreenSide from "./components/screens/patientVisit/AllergyScreenSide";
+import DependentScreenSide from "./components/screens/patientVisit/DependentScreenSide";
 const Drawer = createDrawerNavigator();
 
 
 const NewDrawerNavigator = ({header}) => {
+  const navigation = useNavigation();
+  const [headerShown, setHeaderShown] = useState(header);
+
+  const NonHeaderRoutes = ['DateAndTimeScreen', 'SelectProviderScreen', 'ReasonScreen', 'SymptomsScreen', 'MedicalHistoryScreen', 'MedicationScreen', 'AllergyScreen', 'VitalScreen', 'DocumentScreen', 'InsuranceScreen', 'TermScreen', 'PaymentScreen', 'CardScreen']
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('state', () => {
+      const currentRouteName = navigation.getCurrentRoute().name;
+      if(currentRouteName == "Home"){
+        setHeaderShown(true);
+        
+      }
+      if(!currentRouteName){
+        setHeaderShown(true);
+      }
+      if(NonHeaderRoutes.find((a)=>a == currentRouteName)){
+        setHeaderShown(false);
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={{flex: 1, paddingBottom: 0}}>
-      <Drawer.Navigator screenOptions={{ headerShown: header }} drawerContent={(props) => <CustomSidebarMenu {...props} />}  drawerStyle={{ paddingBottom: 20 }}>
+      <Drawer.Navigator screenOptions={{ headerShown: headerShown }} drawerContent={(props) => <CustomSidebarMenu {...props} />}  drawerStyle={{ paddingBottom: 20 }}>
         <Drawer.Screen name="DashboardScreen" component={HomeTabNavigator} />
         <Drawer.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Drawer.Screen name="DemographicScreen" component={DemographicScreen} />
         <Drawer.Screen name="DependentScreen" component={DependentScreen} />
+        <Drawer.Screen name="DependentScreenSide" component={DependentScreenSide} />
         <Drawer.Screen name="ImmunizationScreen" component={ImmunizationScreen} />
         <Drawer.Screen name="InsuranceScreen" component={InsuranceScreen} />
         <Drawer.Screen name="InsuranceScreenSide" component={InsuranceScreenSide} />

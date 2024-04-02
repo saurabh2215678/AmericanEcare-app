@@ -59,16 +59,16 @@ export const SideBarData = [
                 navigateTo: 'ImmunizationScreen'
              
             },
-            // {
-            //     name: 'Medication',
-            //     icon: 'leaf',
-            //     navigateTo: 'MedicationScreenSide'
-            // },
-            // {
-            //     name: 'Allergy',
-            //     icon: 'forumbee',
-            //     navigateTo: 'AllergyScreenSide'
-            // },
+            {
+                name: 'Medication',
+                icon: 'leaf',
+                navigateTo: 'MedicationScreenSide'
+            },
+            {
+                name: 'Allergy',
+                icon: 'forumbee',
+                navigateTo: 'AllergyScreenSide'
+            },
             {
                 name: 'Diagnosis',
                 icon: 'file-text',

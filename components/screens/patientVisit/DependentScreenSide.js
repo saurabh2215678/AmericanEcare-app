@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import axios from 'axios';
 
-const DependentScreen = ({route,navigation}) => {
+const DependentScreenSide = ({route,navigation}) => {
     const API_URL = Strings.baseUrl.url;
     const [Dob, setUserDob] = useState('');
     const [DisplayAlert, setDisplayAlert] = useState(0)
@@ -317,4 +317,4 @@ Genderdropdown: {
   },
 });
 
-export default DependentScreen;
+export default DependentScreenSide;

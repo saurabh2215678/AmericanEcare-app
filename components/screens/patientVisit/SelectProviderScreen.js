@@ -180,7 +180,7 @@ const provider_submit=()=>{
 }
 
 const backPress=()=>{
-
+    console.log('press back ==', request_type);
   if(request_type ==1)
   {
      navigation.navigate("DateAndTimeScreen",{request_type: request_type});
@@ -188,6 +188,8 @@ const backPress=()=>{
   if(request_type ==0)
   {
     navigation.navigate("ScheduleScreen",{request_type: request_type});
+  }else{
+    navigation.navigate("DateAndTimeScreen",{request_type: request_type});
   }
 }
 
