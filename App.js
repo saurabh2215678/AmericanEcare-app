@@ -58,7 +58,7 @@ const NewDrawerNavigator = ({header}) => {
   const navigation = useNavigation();
   const [headerShown, setHeaderShown] = useState(header);
 
-  const NonHeaderRoutes = ['DateAndTimeScreen', 'SelectProviderScreen', 'ReasonScreen', 'SymptomsScreen', 'MedicalHistoryScreen', 'MedicationScreen', 'AllergyScreen', 'VitalScreen', 'DocumentScreen', 'InsuranceScreen', 'TermScreen', 'PaymentScreen', 'CardScreen']
+  const NonHeaderRoutes = ['DateAndTimeScreen', 'SelectProviderScreen', 'ReasonScreen', 'SymptomsScreen', 'MedicalHistoryScreen', 'MedicationScreen', 'AllergyScreen', 'VitalScreen', 'DocumentScreen', 'InsuranceScreen', 'TermScreen', 'PaymentScreen', 'CardScreen', 'ScheduleScreen', 'MyVisitScreen', 'DemographicScreen']
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('state', () => {

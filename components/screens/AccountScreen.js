@@ -135,7 +135,7 @@ const getPatientId = async () => {
                                 <View style={[Styles.sectionView, { justifyContent: 'space-between' }]}>
                                     <View style={{ flexDirection: 'row' }}>
                                         <Image source={images.ic_profileF} style={Styles.iconStyle} resizeMode={'stretch'} />
-                                        <Text style={Styles.leblaStyle}>{patient_name}</Text>
+                                        <Text style={Styles.leblaStyle}>{patient_name} ggh</Text>
                                         
                                     </View>
                                     <TouchableOpacity style={{ right: SH(10) }}

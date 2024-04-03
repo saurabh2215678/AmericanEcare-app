@@ -62,6 +62,7 @@ const HomeTabNavigator = () => {
         tabBarInactiveTintColor: "gray",
         headerShown: false,
       })}
+      onTabPress={({ route }) => console.log('Screen Name:', route.name)}
     >
       <Tab.Screen
         name="Home"
@@ -72,7 +73,7 @@ const HomeTabNavigator = () => {
         name="Profile"
         component={AccountScreen}
         options={{
-          headerShown: true,
+          headerShown: false,
           headerTitle: "My Profile Section",
           headerTitleAlign: "center",
         }}

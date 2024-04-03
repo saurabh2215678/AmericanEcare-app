@@ -15,7 +15,7 @@ const defaultSelectLoadOption = {"id": -1, "pharmacy_name": "Loading..."};
 const defaultSelectNoOption = {"id": -1, "pharmacy_name": "No Pharmacy"};
 
 
-const PharmacyScreen = ({nextbuttonShown}) => {
+const PharmacyScreenStep = ({nextbuttonShown}) => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [pharmecyList, setPharmecyList] = useState([]);
@@ -172,7 +172,7 @@ const PharmacyScreen = ({nextbuttonShown}) => {
   )
 }
 
-export default PharmacyScreen;
+export default PharmacyScreenStep;
 
 
 const buttonStyle = {backgroundColor: '#33BAD8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};

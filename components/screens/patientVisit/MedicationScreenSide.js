@@ -232,7 +232,7 @@ const MedicationScreenSide = () => {
                       onValueChange={(itemValue, itemIndex) => setselectBox(itemValue)}
                       style={selectStyle}
                     >
-                      <Picker.Item label="Self" value="1" style={optionStyle} />
+                      {/* <Picker.Item label="Self" value="1" style={optionStyle} /> */}
                       <Picker.Item label="ghnb, vhhb" value="2" style={optionStyle} />
                       <Picker.Item label="gjbv, xguhvf" value="3" style={optionStyle} />
   
