@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+import { StackActions } from '@react-navigation/native';
 
 const CardScreen = ({route,navigation}) => {
     const API_URL = Strings.baseUrl.url;
@@ -77,7 +78,14 @@ const CardScreen = ({route,navigation}) => {
 
 
     const { request_type} = route.params;
+    
 
+    // const resetAction = StackActions.reset({
+    //   index: 0, // navigate to the first screen in the stack
+    //   actions: [
+    //     navigation.navigate({ routeName: 'DashboardScreen' }), // replace 'Home' with your desired screen name
+    //   ],
+    // });
 
 
 
@@ -291,6 +299,7 @@ const update_documents = async (phi_id)=>{
 
 
 const final_submit = ()=>{
+
   if(!card_holder_name)
   {
     alert("Enter Card holder name");
@@ -324,119 +333,84 @@ const final_submit = ()=>{
   let expiration_arr = expiration.split('/');
   let month = expiration_arr[0];
   let year = expiration_arr[1];
+  const formdata = new FormData();
+  formdata.append("patient_id",  patientId);
+  formdata.append("dependent_id",  dependent_id);
+  formdata.append("total", total);
+  formdata.append("card_holder_name", card_holder_name);
+  formdata.append("credit_card_number", credit_card_number);
+  formdata.append("expiration_month", month);
+  formdata.append("expiration_year", year);
+  formdata.append("cvc", cvc);
+  formdata.append("billing_address", billing_address);
+  formdata.append("booking_date", booking_date);
+  formdata.append("booking_time", booking_time);
+  formdata.append("reason_visit", reason_visit);
+  formdata.append("current_health_concern", current_health_concern);
+  formdata.append("visit_type", visit_type);
+  formdata.append("request_type", request_type);
+  formdata.append("doctor_id", doctor_id);
+  formdata.append("duration", duration);
+  formdata.append("weight", weight);
+  formdata.append("height_in", height_in);
+  formdata.append("height_ft", height_ft);
+  formdata.append("bmi", bmi);
+  formdata.append("bp_low", bp_low);
+  formdata.append("bp_high", bp_high);
+  formdata.append("temprature", temprature);
+  formdata.append("pulse", pulse);
+  formdata.append("o2sat", o2sat);
+  formdata.append("insurance_name", insurance_name);
+  formdata.append("subscriber_name", subscriber_name);
+  formdata.append("identification_number", identification_number);
+  formdata.append("group_number", group_number);
+  formdata.append("rxbin", rxbin);
+  formdata.append("rxpcn", rxpcn);
+  formdata.append("rxgrp", rxgrp);
+  formdata.append("device", 'ios');
+  formdata.append("coupon_id", coupon_id);
+  formdata.append("discount", discount);
+  if(labresult && labimage && other_image){
+    formdata.append("lab_result", { uri: labresult, name: labresultFileName, type:labresult_type });
+    formdata.append("lab_picture", { uri: labimage, name: labImageFileName, type:labimage_type });
+    formdata.append("lab_document", { uri: other_image, name: OtherImageFileName, type:other_image_type });
+  }
 
-let formData = new FormData();
+  const requestOptions = {
+    method: "POST",
+    body: formdata,
+    redirect: "follow"
+  };
 
-formData.append('lab_result', { uri: labresult, name: labresultFileName, labresult_type }); 
-formData.append('lab_picture', { uri: labimage, name: labImageFileName, labimage_type }); 
-formData.append('lab_document', { uri: other_image, name: OtherImageFileName, other_image_type });
-formData.append('patient_id', patientId); 
-formData.append('dependent_id', dependent_id); 
-formData.append('total', total); 
-formData.append('card_holder_name', card_holder_name); 
-formData.append('card_holder_name', card_holder_name); 
-formData.append('credit_card_number', credit_card_number); 
-formData.append('expiration_date', month); 
-formData.append('expiration_year', year); 
-formData.append('billing_address', billing_address); 
-formData.append('booking_date', booking_date); 
-formData.append('booking_time', booking_time); 
-formData.append('reason_visit', reason_visit); 
-formData.append('current_health_concern', current_health_concern); 
-formData.append('visit_type', visit_type); 
-formData.append('request_type', request_type); 
-formData.append('doctor_id', doctor_id); 
-formData.append('duration', duration); 
-formData.append('weight', weight); 
-formData.append('height_in', height_in); 
-formData.append('height_ft', height_ft); 
-formData.append('bmi', bmi); 
-formData.append('bp_low', bp_low); 
-formData.append('bp_high', bp_high); 
-formData.append('temprature', temprature); 
-formData.append('pulse', pulse); 
-formData.append('o2sat', o2sat); 
-formData.append('insurance_name', insurance_name); 
-formData.append('subscriber_name', subscriber_name); 
-formData.append('identification_number', identification_number); 
-formData.append('group_number', group_number); 
-formData.append('rxbin', rxbin); 
-formData.append('rxpcn', rxpcn); 
-formData.append('rxgrp', rxgrp); 
-formData.append('sub_symptoms', symptoms); 
-formData.append('device', 'ios'); 
+  fetch(API_URL+"front/api/booking_visit", requestOptions)
+    .then((response) => response.text())
+    .then((result) => {
+      console.log('result ==', result);
+      clearLabFilesFromAsyncStorage();
+    })
+    .catch((error) => console.error(error));
+}
+const clearLabFilesFromAsyncStorage = async () => {
+  const labresult_type= await AsyncStorage.removeItem('labresult_type');
+  const labresult= await AsyncStorage.removeItem('labresult');
+  const labresultFileName= await AsyncStorage.removeItem('labresultFileName');
 
+  const labimage_type= await AsyncStorage.removeItem('labimage_type');
+  const labimage= await AsyncStorage.removeItem('labimage');
+  const labImageFileName= await AsyncStorage.removeItem('labImageFileName');
 
- setLoading(true); // Set loading before sending API request
- let axiosConfig = {
-              headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-              }
-           };
+  const other_image_type= await AsyncStorage.removeItem('other_image_type');
+  const other_image= await AsyncStorage.removeItem('other_image');
+  const OtherImageFileName= await AsyncStorage.removeItem('OtherImageFileName');
+ 
+  navigation.reset({
+    index: 0,
+    routes: [{ name: 'ThankyouScreen' }],
+  });
 
-  // axios.post(API_URL+'front/api/booking_visit', formData, {
-  //           headers: { 'Content-Type': 'multipart/form-data' },
-  //       }).then(responseJson => {
-           
-  //           if(responseJson.data.status == "success")  
-  //               {
-  //                   navigation.navigate("ThankyouScreen",{
-  //                     request_type: request_type,
-  //                   });
-  //               }
-  //               else
-  //               {
-  //                 setLoading(false); // Set loading before sending API request
-  //                 alert(responseJson.data.msg);
-  //                 return;
-  //               }
-
-  //       }).catch(err => {
-          
-  //           alert(err.response);
-  //            setLoading(false)
-  //       });          
-
-
-
-
-
-
-
-         axios.post(API_URL+'front/api/booking_visit', formData, axiosConfig)
-                   .then((responseJson) => {   
-                  console.log(responseJson.data);
-                  if(responseJson.data.status == "success")  
-                  {
-
-                      if(labresultFileName != '' || labImageFileName != '' && OtherImageFileName != '')
-                      {
-                          update_documents(responseJson.data.phi_id);
-                      }
-                      else
-                      {
-                         navigation.navigate("ThankyouScreen",{
-                          request_type: request_type,
-                        });
-                      }
-
-                       
-                  }
-                  else
-                  {
-                    setLoading(false); // Set loading before sending API request
-                    console.log("this is else");
-                    alert(responseJson.data.msg);
-                    return;
-                  }
-
-
-        })
-               
-      .catch(err => console.log('Payment API: ', err));
+  console.log('ceared');
 
 }
-  
 
 useEffect(() => {
 

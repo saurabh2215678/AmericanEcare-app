@@ -27,7 +27,7 @@ const ThankyouScreen = ({route,navigation}) => {
     const [rx_bin, set_rx_bin] = useState("");
     const [rx_pcn, set_rx_pcn] = useState("");
     const [rx_grp, set_rx_grp] = useState("");
-    const { request_type} = route.params;
+    // const { request_type} = route.params;
 
 
     const [patientId, setpatientId] = useState("");
@@ -86,7 +86,7 @@ const getBMI = (heightinInch)=>{
 
 
  submitVital= ()=>{
-  navigation.navigate("DocumentScreen",{request_type: request_type});
+  // navigation.navigate("DocumentScreen",{request_type: request_type});
 }
 
 
@@ -102,7 +102,7 @@ useEffect(() => {
     
   return (
 
-  	  <Container>
+  	  <Container backgroundColor="#e3f2f0">
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
             <View style={Style.setheaderspacepadding}>
                 

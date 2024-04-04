@@ -134,7 +134,7 @@ const PharmacyScreenStep = ({request_type}) => {
 
       <View style={{paddingHorizontal: 15}}>
         <Button
-          title="Skip"
+          title="Next"
           onPress={()=>navigation.navigate('TermScreen',{request_type: request_type})}
           style={ButtonStyle} />
       </View>
