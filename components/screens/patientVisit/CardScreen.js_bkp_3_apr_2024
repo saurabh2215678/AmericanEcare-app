@@ -234,6 +234,7 @@ const update_documents = async (phi_id)=>{
      
 
     const labresult_type= await AsyncStorage.getItem('labresult_type');
+    //const labresult_type= `image/jpeg`;
     const labresult= await AsyncStorage.getItem('labresult');
     const labresultFileName= await AsyncStorage.getItem('labresultFileName');
 
@@ -291,80 +292,86 @@ const update_documents = async (phi_id)=>{
 
 
 const final_submit = ()=>{
-  if(!card_holder_name)
-  {
-    alert("Enter Card holder name");
-    return;
-  }
 
-  if(!credit_card_number)
-  {
-    alert("Enter Card number");
-    return;
-  }
 
-  if(!expiration)
-  {
-    alert("Enter Card Expiry date");
-    return;
-  }
 
-  if(!cvc)
-  {
-    alert("Enter Cvv number");
-    return;
-  }
+if(!card_holder_name)
+{
+  alert("Enter Card holder name");
+  return;
+}
 
-  if(!billing_address)
-  {
-    alert("Enter Billing Address");
-    return;
-  }
 
-  let expiration_arr = expiration.split('/');
-  let month = expiration_arr[0];
-  let year = expiration_arr[1];
+if(!credit_card_number)
+{
+  alert("Enter Card number");
+  return;
+}
 
-let formData = new FormData();
+if(!expiration)
+{
+  alert("Enter Card Expiry date");
+  return;
+}
 
-formData.append('lab_result', { uri: labresult, name: labresultFileName, labresult_type }); 
-formData.append('lab_picture', { uri: labimage, name: labImageFileName, labimage_type }); 
-formData.append('lab_document', { uri: other_image, name: OtherImageFileName, other_image_type });
-formData.append('patient_id', patientId); 
-formData.append('dependent_id', dependent_id); 
-formData.append('total', total); 
-formData.append('card_holder_name', card_holder_name); 
-formData.append('card_holder_name', card_holder_name); 
-formData.append('credit_card_number', credit_card_number); 
-formData.append('expiration_date', month); 
-formData.append('expiration_year', year); 
-formData.append('billing_address', billing_address); 
-formData.append('booking_date', booking_date); 
-formData.append('booking_time', booking_time); 
-formData.append('reason_visit', reason_visit); 
-formData.append('current_health_concern', current_health_concern); 
-formData.append('visit_type', visit_type); 
-formData.append('request_type', request_type); 
-formData.append('doctor_id', doctor_id); 
-formData.append('duration', duration); 
-formData.append('weight', weight); 
-formData.append('height_in', height_in); 
-formData.append('height_ft', height_ft); 
-formData.append('bmi', bmi); 
-formData.append('bp_low', bp_low); 
-formData.append('bp_high', bp_high); 
-formData.append('temprature', temprature); 
-formData.append('pulse', pulse); 
-formData.append('o2sat', o2sat); 
-formData.append('insurance_name', insurance_name); 
-formData.append('subscriber_name', subscriber_name); 
-formData.append('identification_number', identification_number); 
-formData.append('group_number', group_number); 
-formData.append('rxbin', rxbin); 
-formData.append('rxpcn', rxpcn); 
-formData.append('rxgrp', rxgrp); 
-formData.append('sub_symptoms', symptoms); 
-formData.append('device', 'ios'); 
+if(!cvc)
+{
+  alert("Enter Cvv number");
+  return;
+}
+
+if(!billing_address)
+{
+  alert("Enter Billing Address");
+  return;
+}
+
+
+let expiration_arr = expiration.split('/');
+
+let month = expiration_arr[0];
+let year = expiration_arr[1];
+
+//let formData = new FormData();
+
+// formData.append('lab_result', { uri: labresult, name: labresultFileName, labresult_type }); 
+// formData.append('lab_picture', { uri: labimage, name: labImageFileName, labimage_type }); 
+// formData.append('lab_document', { uri: other_image, name: OtherImageFileName, other_image_type });
+// formData.append('patient_id', patientId); 
+// formData.append('dependent_id', dependent_id); 
+// formData.append('total', total); 
+// formData.append('card_holder_name', card_holder_name); 
+// formData.append('card_holder_name', card_holder_name); 
+// formData.append('credit_card_number', credit_card_number); 
+// formData.append('expiration_date', month); 
+// formData.append('expiration_year', year); 
+// formData.append('billing_address', billing_address); 
+// formData.append('booking_date', booking_date); 
+// formData.append('booking_time', booking_time); 
+// formData.append('reason_visit', reason_visit); 
+// formData.append('current_health_concern', current_health_concern); 
+// formData.append('visit_type', visit_type); 
+// formData.append('request_type', request_type); 
+// formData.append('doctor_id', doctor_id); 
+// formData.append('duration', duration); 
+// formData.append('weight', weight); 
+// formData.append('height_in', height_in); 
+// formData.append('height_ft', height_ft); 
+// formData.append('bmi', bmi); 
+// formData.append('bp_low', bp_low); 
+// formData.append('bp_high', bp_high); 
+// formData.append('temprature', temprature); 
+// formData.append('pulse', pulse); 
+// formData.append('o2sat', o2sat); 
+// formData.append('insurance_name', insurance_name); 
+// formData.append('subscriber_name', subscriber_name); 
+// formData.append('identification_number', identification_number); 
+// formData.append('group_number', group_number); 
+// formData.append('rxbin', rxbin); 
+// formData.append('rxpcn', rxpcn); 
+// formData.append('rxgrp', rxgrp); 
+// formData.append('sub_symptoms', symptoms); 
+// formData.append('device', 'ios'); 
 
 
  setLoading(true); // Set loading before sending API request
@@ -399,13 +406,53 @@ formData.append('device', 'ios');
 
 
 
+        const body = { 
+                patient_id: patientId,
+                dependent_id: dependent_id,
+                total:total,
+                card_holder_name:card_holder_name,
+                credit_card_number:credit_card_number,
+                expiration_month:month,
+                expiration_year:year,
+                cvc:cvc,
+                billing_address:billing_address,
+                billing_address:billing_address,
+                booking_date:booking_date,
+                booking_time:booking_time,
+                reason_visit:reason_visit,
+                current_health_concern:current_health_concern,
+                visit_type:visit_type,
+                request_type:request_type,
+                doctor_id:doctor_id,
+                duration:duration,
+                weight:weight,
+                height_in:height_in,
+                height_ft:height_ft,
+                bmi:bmi,
+                bp_low:bp_low,
+                bp_high:bp_high,
+                temprature:temprature,
+                pulse:pulse,
+                o2sat:o2sat,
+                insurance_name:insurance_name,
+                subscriber_name:subscriber_name,
+                identification_number:identification_number,
+                group_number:group_number,
+                rxbin:rxbin,
+                rxpcn:rxpcn,
+                rxgrp:rxgrp,
+                sub_symptoms:symptoms,
+                device:'ios',
+                coupon_id:coupon_id,
+                discount:discount,
+           };
 
 
 
 
-         axios.post(API_URL+'front/api/booking_visit', formData, axiosConfig)
+         axios.post(API_URL+'front/api/booking_visit', body, axiosConfig)
                    .then((responseJson) => {   
-                  console.log(responseJson.data);
+                  // console.log(responseJson.data);
                   if(responseJson.data.status == "success")  
                   {
 

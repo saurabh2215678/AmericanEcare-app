@@ -63,11 +63,12 @@ const InsuranceScreen = ({route,navigation}) => {
   AsyncStorage.setItem("rxgrp", rx_grp);
   
   // navigation.navigate("TermScreen",{request_type: request_type});
-  navigation.navigate("TermScreen",{request_type: request_type});
+  navigation.navigate("PharmacyScreenStep",{request_type: request_type});
 }
 
 skipInsurance= ()=>{
-  navigation.navigate("TermScreen",{request_type: request_type});
+  // navigation.navigate("TermScreen",{request_type: request_type});
+  navigation.navigate("PharmacyScreenStep",{request_type: request_type});
 }
 
 

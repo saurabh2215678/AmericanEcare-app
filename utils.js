@@ -46,69 +46,69 @@ export const SideBarData = [
             {
                 name: 'Insurance',
                 icon: 'universal-access',
-                navigateTo: 'InsuranceScreenSide'
+                navigateTo: 'Insurance'
             },
             {
                 name: 'Pharmacy',
                 icon: 'hospital-o',
-                navigateTo: 'PharmacyScreen'
+                navigateTo: 'Pharmacy'
             },
             {
                 name: 'Immunization',
                 icon: 'linode',
-                navigateTo: 'ImmunizationScreen'
+                navigateTo: 'Immunization'
              
             },
             {
                 name: 'Medication',
                 icon: 'leaf',
-                navigateTo: 'MedicationScreenSide'
+                navigateTo: 'Medication'
             },
             {
                 name: 'Allergy',
                 icon: 'forumbee',
-                navigateTo: 'AllergyScreenSide'
+                navigateTo: 'Allergy'
             },
             {
                 name: 'Diagnosis',
                 icon: 'file-text',
-                navigateTo: 'DiagnosisScreen'
+                navigateTo: 'Diagnosis'
             },
             {
                 name: 'Past Medical History',
                 icon: 'medium',
-                navigateTo: 'MedicalHistoryScreenSide'
+                navigateTo: 'Past Medical History'
             },
             {
                 name: 'Past Surgery Histroy',
                 icon: 'leaf',
-                navigateTo: 'PastSurgeryScreen'
+                navigateTo: 'Past Surgery Histroy'
             },
             {
                 name: 'Patient Social Histroy',
                 icon: 'forumbee',
-                navigateTo: 'PatientSocialHistory'
+                navigateTo: 'Patient Social Histroy'
             },
             {
                 name: 'OBGYN',
                 icon: 'universal-access',
-                navigateTo: 'ObgynHistory'
+                navigateTo: 'OBGYN'
             },
             {
                 name: 'Family History',
                 icon: 'leaf',
-                navigateTo: 'FamilyHistory'
+                navigateTo: 'Family History'
             },
             {
                 name: 'Vital History',
                 icon: 'linode',
-                navigateTo: 'VitalHistory'
+                navigateTo: 'Vital History'
              
             },
             {
                 name: 'Documents',
                 icon: 'universal-access',
-                navigateTo: 'PatientDocuments'
+                navigateTo: 'Documents'
             }
         ]
     }

@@ -51,6 +51,7 @@ import MedicalHistoryScreenSide from "./components/screens/patientVisit/MedicalH
 import MedicationScreenSide from "./components/screens/patientVisit/MedicationScreenSide";
 import AllergyScreenSide from "./components/screens/patientVisit/AllergyScreenSide";
 import DependentScreenSide from "./components/screens/patientVisit/DependentScreenSide";
+import PharmacyScreenStep from "./components/screens/patientVisit/PharmacyScreenStep";
 const Drawer = createDrawerNavigator();
 
 
@@ -86,27 +87,28 @@ const NewDrawerNavigator = ({header}) => {
         <Drawer.Screen name="DemographicScreen" component={DemographicScreen} />
         <Drawer.Screen name="DependentScreen" component={DependentScreen} />
         <Drawer.Screen name="DependentScreenSide" component={DependentScreenSide} />
-        <Drawer.Screen name="ImmunizationScreen" component={ImmunizationScreen} />
+        <Drawer.Screen name="Immunization" component={ImmunizationScreen} />
         <Drawer.Screen name="InsuranceScreen" component={InsuranceScreen} />
-        <Drawer.Screen name="InsuranceScreenSide" component={InsuranceScreenSide} />
+        <Drawer.Screen name="Insurance" component={InsuranceScreenSide} />
         <Drawer.Screen name="Home" component={HomeTabNavigator} />
         <Drawer.Screen name="DateAndTimeScreen" component={DateAndTimeScreen} />
         <Drawer.Screen name="ScheduleScreen" component={ScheduleScreen} />
         <Drawer.Screen name="MyVisitScreen" component={MyVisitScreen} />
-        <Drawer.Screen name="PharmacyScreen" component={PharmacyScreen} />
+        <Drawer.Screen name="Pharmacy" component={PharmacyScreen} />
+        <Drawer.Screen name="PharmacyScreenStep" component={PharmacyScreenStep} />
         <Drawer.Screen name="MedicationScreen" component={MedicationScreen} />
-        <Drawer.Screen name="MedicationScreenSide" component={MedicationScreenSide} />
+        <Drawer.Screen name="Medication" component={MedicationScreenSide} />
         <Drawer.Screen name="AllergyScreen" component={AllergyScreen} />
-        <Drawer.Screen name="AllergyScreenSide" component={AllergyScreenSide} />
-        <Drawer.Screen name="PastSurgeryScreen" component={PastSurgeryScreen} />
-        <Drawer.Screen name="DiagnosisScreen" component={DiagnosisScreen} />
+        <Drawer.Screen name="Allergy" component={AllergyScreenSide} />
+        <Drawer.Screen name="Past Surgery Histroy" component={PastSurgeryScreen} />
+        <Drawer.Screen name="Diagnosis" component={DiagnosisScreen} />
         <Drawer.Screen name="MedicalHistoryScreen" component={MedicalHistoryScreen} />
-        <Drawer.Screen name="MedicalHistoryScreenSide" component={MedicalHistoryScreenSide} />
-        <Drawer.Screen name="PatientSocialHistory" component={PatientSocialHistory} />
-        <Drawer.Screen name="ObgynHistory" component={ObgynHistory} />
-        <Drawer.Screen name="FamilyHistory" component={FamilyHistory} />
-        <Drawer.Screen name="VitalHistory" component={VitalHistory} />
-        <Drawer.Screen name="PatientDocuments" component={PatientDocuments} />
+        <Drawer.Screen name="Past Medical History" component={MedicalHistoryScreenSide} />
+        <Drawer.Screen name="Patient Social Histroy" component={PatientSocialHistory} />
+        <Drawer.Screen name="OBGYN" component={ObgynHistory} />
+        <Drawer.Screen name="Family History" component={FamilyHistory} />
+        <Drawer.Screen name="Vital History" component={VitalHistory} />
+        <Drawer.Screen name="Documents" component={PatientDocuments} />
         <Drawer.Screen name="SelectProviderScreen" component={SelectProviderScreen} />
         <Drawer.Screen name="ReasonScreen" component={ReasonScreen} />
         <Drawer.Screen name="SymptomsScreen" component={SymptomsScreen} />

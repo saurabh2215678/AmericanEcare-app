@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container } from "../components";
+import { AppHeader, Button, Container } from "../components";
 import { Pressable, ScrollView, TouchableOpacity, View, Text, Modal, TextInput, Keyboard, ActivityIndicator  } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PharmecyItem from "../components/PharmecyItem";
@@ -8,6 +8,10 @@ import { HitApi } from "../../../utils";
 import { TouchableWithoutFeedback } from "react-native";
 import { useSelector } from 'react-redux';
 import Toast from "react-native-toast-message";
+import images from "../images";
+import { useNavigation } from "@react-navigation/native";
+import { SH, widthPercent } from "../utils";
+
 
 
 const defaultSelectOption = {"id": -1, "pharmacy_name": "Select Pharmacy"};
@@ -15,7 +19,7 @@ const defaultSelectLoadOption = {"id": -1, "pharmacy_name": "Loading..."};
 const defaultSelectNoOption = {"id": -1, "pharmacy_name": "No Pharmacy"};
 
 
-const PharmacyScreenStep = ({nextbuttonShown}) => {
+const PharmacyScreenStep = ({request_type}) => {
   const storeUser = useSelector((state) => state.user.userData)
   const [addModal, setAddMoal] = useState(false);
   const [pharmecyList, setPharmecyList] = useState([]);
@@ -28,6 +32,7 @@ const PharmacyScreenStep = ({nextbuttonShown}) => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteModal, setDeleteMoal] = useState(false); //DeleteConfirm 1
+  const navigation = useNavigation();
 
   const getPharmecyDropdownList = async () => {
     setPharmecySelectData([defaultSelectLoadOption]);
@@ -107,21 +112,33 @@ const PharmacyScreenStep = ({nextbuttonShown}) => {
   },[]);
 
   return(
-    <Container>
+    <Container backgroundColor="#e3f2f0">
+      <View>
       <ScrollView style={fullDependent}>
+        <AppHeader
+            leftImage={images.back_image}
+            title="Pharmacy"
+            onLeftPress={() => navigation.navigate('InsuranceScreen',{request_type: request_type})} />
         <TouchableOpacity style={{alignSelf: 'flex-end'}} onPress={()=>setAddMoal(true)}>
             <View style={{backgroundColor: '#33BAD8', paddingHorizontal:7, paddingVertical: 6, margin: 8, borderRadius: 3 }}>
               <Icon name="plus" size={12} color="#ffffff" />
             </View>
         </TouchableOpacity>
         
-        <View>
+        <View style={{flexGrow: 1}}>
       
         {dataLoading && <ActivityIndicator size="large" color="#33BAD8" />}
           {pharmecyList.map((item, index)=><PharmecyItem key={index} data={item} handleDelete={handleDelete} deleteLoading={deleteLoading}/>)}
         </View>
-        {nextbuttonShown && <Text>next btn</Text>}
       </ScrollView>
+
+      <View style={{paddingHorizontal: 15}}>
+        <Button
+          title="Skip"
+          onPress={()=>navigation.navigate('TermScreen',{request_type: request_type})}
+          style={ButtonStyle} />
+      </View>
+      </View>
       <Modal
         visible={addModal}
         animationType="fade"
@@ -183,8 +200,15 @@ const InputStyle = {width: '90%', borderBottomWidth: 1, borderColor: '#ababab'};
 const headlineStyle = {padding: 5, paddingBottom: 12, borderBottomWidth:1, borderColor: '#dedede', fontSize: 16, fontWeight: 500, color: '#666666', width: '100%', textAlign: 'center', marginBottom: 15}
 const errorStyle = {textAlign: 'left', width: '100%', paddingLeft: 16, fontSize: 12, color: 'red'}
 const spacer = {padding: 10}
-const fullDependent = {backgroundColor: '#FEFAEF', flex: 1}
+const fullDependent = {backgroundColor: '#e3f2f0', flexGrow: 1, height: "85%"}
 const optionStyle = { fontSize: 14 }
 const selectStyle = {margin: -16, marginBottom: -8}
 const selectWrapper = {justifyContent : 'center', width: '90%', position: 'relative', borderBottomWidth:1, borderColor: '#ababab', }
 const loadingbuttonStyle = {backgroundColor: '#87e3f8', flex: 1, alignItems: 'center', justifyContent: 'center', padding:10, borderRadius: 5};
+const ButtonStyle =  {
+  marginHorizontal: widthPercent('5%'),
+  marginTop: SH(30),
+  width: '90%',
+  height : SH(50),
+  alignSelf: 'flex-end'
+}
